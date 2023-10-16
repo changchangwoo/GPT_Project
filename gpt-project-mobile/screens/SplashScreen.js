@@ -2,9 +2,24 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, Button, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import axios from 'axios';
+import { TextInput } from 'react-native-gesture-handler';
 
 export default function App() {
     const [image, setImage] = useState(null);
+    const [text, setText] = useState('');
+    const [response, setResponse] = useState('');
+
+    const sendTextToServer = async () => {
+        try {
+            const apiUrl = 'http://172.30.1.84:5000/ask'; // Flask 서버의 엔드포인트 URL로 대체
+
+            const response = await axios.post(apiUrl, { text });
+
+            setResponse(response.data);
+        } catch (error) {
+            console.error('데이터 전송 실패:', error);
+        }
+    };
 
     useEffect(() => {
         // 컴포넌트가 마운트될 때 카메라 액세스 권한을 요청
@@ -33,7 +48,7 @@ export default function App() {
 
     // 이미지를 Flask 서버로 업로드
     const uploadImage = async (uri) => {
-        const apiUrl = 'http://172.30.1.75:5000/upload'; // Flask 서버의 엔드포인트 URL로 대체
+        const apiUrl = 'http://172.30.1.84:5000/upload'; // Flask 서버의 엔드포인트 URL로 대체
 
         const formData = new FormData();
         formData.append('image', {
@@ -60,6 +75,15 @@ export default function App() {
             <TouchableOpacity style={styles.button} onPress={selectImage}>
                 <Text style={styles.buttonText}>이미지 선택</Text>
             </TouchableOpacity>
+            <View>
+                <TextInput
+                    style={{ height: 40, borderColor: 'gray', borderWidth: 1, marginVertical: 50 }}
+                    onChangeText={(value) => setText(value)}
+                    value={text}
+                />
+                <Button title="서버로 데이터 전송" onPress={sendTextToServer} />
+                <Text>서버 응답: {response}</Text>
+            </View>
         </View>
     );
 }

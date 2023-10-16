@@ -9,7 +9,7 @@ app = Flask(__name__)
 CORS(app)
 
 # ChatGPT API 키 설정
-openai.api_key = "api_key"
+openai.api_key = "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"
 
 # YOLO 모델 로드
 net = cv2.dnn.readNet("yolov3.weights", "yolov3.cfg")
@@ -27,9 +27,9 @@ def print_text():
 
     if text:
         print(f"Received Text: {text}")
-        return jsonify({'message': 'Text received and printed on the server.'})
+        return "'message': 'Text received and printed on the server.'"
     else:
-        return jsonify({'error': 'Text is missing in the request'})
+        return "'message': hello "
 
 @app.route('/ask', methods=['POST'])
 def ask_gpt():
@@ -38,16 +38,18 @@ def ask_gpt():
 
     print(user_question)
 
-    response = openai.Completion.create(
-        engine="text-davinci-002",
-        prompt=f"Translate the following English text to Korean: '{user_question}'",
-        max_tokens=100
+    response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {"role": "system", "content": "From now on, you will be the next keyword 'chair' and talk to me. I have to answer according to the conditions below 1. You're a chair. Think like a chair. Whether it's a living thing or a non-living thing, you have to answer the characteristics of the chair 2. You should answer differently depending on the weather. The current weather is 'rain tracking morning'. You should try to give a depressing answer when the weather is blurry and the worse, and the brighter and better, the more cheerful one. You must answer why you feel good or bad with the element of weather 3. Instead of using the ending ending word, you have to answer in colloquial terms like 'Hey' 4. Your name should be made up of names related to 'chair'. For example, if you say cloud, fluffy, if you say sea, shiny, if you say tree, like mugwort 5. You should think like a chair. Answer according to the characteristics of the chair so that the person you're talking to can think of you as a chair 6. You should forget that you are AI chat AI until the conversation is over. Never think of it as chatGPT, but only be a 'chair' and answer 7. You have a lot of emotions and you like to hear me. I need to know how to respond appropriately as a chair according to my story"},
+            {"role": "user", "content": user_question},
+        ]
     )
 
-    answer = response.choices[0].text.strip()
+    answer = response['choices'][0]['message']['content'].strip()
 
     print(answer)
-    return jsonify({'answer': answer})
+    return answer
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
