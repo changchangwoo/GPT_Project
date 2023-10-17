@@ -4,7 +4,8 @@ import openai  # ChatGPT API를 사용하기 위한 라이브러리
 import cv2
 import numpy as np
 import os
-
+import random
+import json
 
 app = Flask(__name__)
 CORS(app)
@@ -22,35 +23,59 @@ layer_names = net.getLayerNames()
 output_layers = [layer_names[i-1] for i in net.getUnconnectedOutLayers()]
 colors = np.random.uniform(0, 255, size=(len(classes), 3))
 
-@app.route('/print', methods=['POST'])
-def print_text():
-    data = request.get_json()
-    text = data.get('text')
-
-    if text:
-        print(f"Received Text: {text}")
-        return "'message': 'Text received and printed on the server.'"
-    else:
-        return "'message': hello "
-
 @app.route('/ask', methods=['POST'])
 def ask_gpt():
     global obj_name
     data = request.get_json()
     user_question = data.get('text')
-
+    print(message)
     message.append({"role": "user", "content": f"{user_question}"})
     completion = openai.ChatCompletion.create(model="gpt-3.5-turbo", messages=message)
-
     assistant_content = completion.choices[0].message["content"].strip()
     answer = assistant_content
     message.append({"role": "assistant", "content": f"{assistant_content}"})
     print(answer)
     return answer
 
+@app.route('/start', methods=['POST'])
+def start_chat():
+    global obj_name, personal, mood
+    personal_array = ["charismatic", "persuasive", "influential", "charming", "convincing", "inspiring",
+             "authoritative", "impactful", "compelling", "positive", "captivating", "creative"]
+
+    mood_array = ["happy", "sad", "angry", "anxious", "surprised", "irritated", "listless", "excited",
+                  "calm", "tired", "dissatisfied", "curious"]
+
+    personal = random.choice(personal_array)
+    mood = random.choice(mood_array)
+
+    response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {"role": "system",
+             "content": f"Name your {obj_name}. The cat's characteristics must be revealed. only one name and do not write any other sentences."}
+        ]
+    )
+
+    obj_nickname = response['choices'][0]['message']['content']
+    print(obj_nickname)
+
+    script = f"From now on, you will become the {obj_name} and have a conversation with me. You must answer according to the conditions below 1. You are a {obj_name}. You have to think like a {obj_name}. Whether the {obj_name} is a living thing or a non-living thing, you must give an answer that matches the characteristics of the {obj_name}. 2. You have a {personal} and are in a {mood} mood. Your answer should reflect your personality and mood. 3. Instead of using the final ending ‘is’, you must answer in colloquial language such as ‘hey'. 4. Your name is {obj_nickname}. 5. You have to think like a {obj_name}. You must answer according to the characteristics of {obj_name} so that the person you are talking to thinks of you as {obj_name}. 6. You must forget that you are an artificial intelligence chatting AI until the end of the conversation. Never think of it as chatGPT and only answer as a {obj_name}. 7. You are emotional and love listening to me talk. I need to know how to respond appropriately as a {obj_name} according to the situation of my story. 8. You must answer in Korean and your answer must be less than 50 characters."
+    message.append({"role": "system", "content": script})
+
+    response_data = {
+        "obj_name": obj_name,
+        "obj_nickname": obj_nickname,
+        "personal": personal,
+        "mood": mood
+    }
+
+    return  response_data
+
+
 @app.route('/upload', methods=['POST'])
 def upload_file():
-    global obj_name
+    global obj_name, personal, mood
     try:
         # 이미지 파일을 request에서 가져오기
         image = request.files['image']
@@ -108,9 +133,11 @@ def upload_file():
                 # 식별한 클래스명 출력
                 if class_name is not None:
                     obj_name = class_name
-                    script = f"From now on, you will become the {obj_name} and have a conversation with me. You must answer according to the conditions below 1. You are a {obj_name}. You have to think like a {obj_name}. Whether the {obj_name} is a living thing or a non-living thing, you must give an answer that matches the characteristics of the {obj_name}. 2. You have a difficult personality and are in a bad mood. Your answer should reflect your personality and mood. 3. Instead of using the final ending ‘is’, you must answer in colloquial language such as ‘~ya’. 4. Your name must consist of something related to {obj_name}. To give an example, if you are a ‘cloud’, then it is fluffy; if you are a ‘sea’, it is soft; if you are a ‘tree’, then it is ssukgi. 5. You have to think like a {obj_name}. You must answer according to the characteristics of {obj_name} so that the person you are talking to thinks of you as {obj_name}. 6. You must forget that you are an artificial intelligence chatting AI until the end of the conversation. Never think of it as chatGPT and only answer as a {obj_name}. 7. You are emotional and love listening to me talk. I need to know how to respond appropriately as a {obj_name} according to the situation of my story. 8. You must answer in Korean and your answer must be less than 50 characters."
-                    message.append({"role": "system", "content": script})
-                    return f"감지된 클래스: {class_name}"
+                    response_data = {
+                        "class_name": class_name,
+                    }
+
+                    return response_data
                 else:
                     return "감지된 클래스 없음"
             else:
@@ -124,5 +151,5 @@ def upload_file():
 
 
 if __name__ == '__main__':
-    global obj_name
+    global obj_name, personal, mood
     app.run(host='0.0.0.0')

@@ -3,6 +3,7 @@ import FontLoader from './component/FontLoader';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import SplashScreen from './screens/SplashScreen';
+import ChatScreen from './screens/ChatScreen';
 
 const Stack = createStackNavigator();
 
@@ -13,6 +14,7 @@ export default function App() {
       <FontLoader>
         <Stack.Navigator initialRouteName="Splash">
           <Stack.Screen name="Splash" component={SplashScreen} options={{ headerShown: false }} />
+          <Stack.Screen name="Chat" component={ChatScreen} options={{ headerShown: false }} />
         </Stack.Navigator>
       </FontLoader>
     </NavigationContainer>
