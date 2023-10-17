@@ -1,15 +1,17 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, g
 from flask_cors import CORS
 import openai  # ChatGPT API를 사용하기 위한 라이브러리
 import cv2
 import numpy as np
+import os
 
 
 app = Flask(__name__)
 CORS(app)
 
 # ChatGPT API 키 설정
-openai.api_key = "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"
+openai.api_key = os.environ['OPENAI_API_KEY']
+message = [] # 사용자 대화 내용 기억하는 메세지 배열
 
 # YOLO 모델 로드
 net = cv2.dnn.readNet("yolov3.weights", "yolov3.cfg")
@@ -33,26 +35,22 @@ def print_text():
 
 @app.route('/ask', methods=['POST'])
 def ask_gpt():
+    global obj_name
     data = request.get_json()
     user_question = data.get('text')
 
-    print(user_question)
+    message.append({"role": "user", "content": f"{user_question}"})
+    completion = openai.ChatCompletion.create(model="gpt-3.5-turbo", messages=message)
 
-    response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
-        messages=[
-            {"role": "system", "content": "From now on, you will be the next keyword 'chair' and talk to me. I have to answer according to the conditions below 1. You're a chair. Think like a chair. Whether it's a living thing or a non-living thing, you have to answer the characteristics of the chair 2. You should answer differently depending on the weather. The current weather is 'rain tracking morning'. You should try to give a depressing answer when the weather is blurry and the worse, and the brighter and better, the more cheerful one. You must answer why you feel good or bad with the element of weather 3. Instead of using the ending ending word, you have to answer in colloquial terms like 'Hey' 4. Your name should be made up of names related to 'chair'. For example, if you say cloud, fluffy, if you say sea, shiny, if you say tree, like mugwort 5. You should think like a chair. Answer according to the characteristics of the chair so that the person you're talking to can think of you as a chair 6. You should forget that you are AI chat AI until the conversation is over. Never think of it as chatGPT, but only be a 'chair' and answer 7. You have a lot of emotions and you like to hear me. I need to know how to respond appropriately as a chair according to my story"},
-            {"role": "user", "content": user_question},
-        ]
-    )
-
-    answer = response['choices'][0]['message']['content'].strip()
-
+    assistant_content = completion.choices[0].message["content"].strip()
+    answer = assistant_content
+    message.append({"role": "assistant", "content": f"{assistant_content}"})
     print(answer)
     return answer
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
+    global obj_name
     try:
         # 이미지 파일을 request에서 가져오기
         image = request.files['image']
@@ -109,6 +107,9 @@ def upload_file():
 
                 # 식별한 클래스명 출력
                 if class_name is not None:
+                    obj_name = class_name
+                    script = f"From now on, you will become the {obj_name} and have a conversation with me. You must answer according to the conditions below 1. You are a {obj_name}. You have to think like a {obj_name}. Whether the {obj_name} is a living thing or a non-living thing, you must give an answer that matches the characteristics of the {obj_name}. 2. You have a difficult personality and are in a bad mood. Your answer should reflect your personality and mood. 3. Instead of using the final ending ‘is’, you must answer in colloquial language such as ‘~ya’. 4. Your name must consist of something related to {obj_name}. To give an example, if you are a ‘cloud’, then it is fluffy; if you are a ‘sea’, it is soft; if you are a ‘tree’, then it is ssukgi. 5. You have to think like a {obj_name}. You must answer according to the characteristics of {obj_name} so that the person you are talking to thinks of you as {obj_name}. 6. You must forget that you are an artificial intelligence chatting AI until the end of the conversation. Never think of it as chatGPT and only answer as a {obj_name}. 7. You are emotional and love listening to me talk. I need to know how to respond appropriately as a {obj_name} according to the situation of my story. 8. You must answer in Korean and your answer must be less than 50 characters."
+                    message.append({"role": "system", "content": script})
                     return f"감지된 클래스: {class_name}"
                 else:
                     return "감지된 클래스 없음"
@@ -123,5 +124,5 @@ def upload_file():
 
 
 if __name__ == '__main__':
-    print('hello')
+    global obj_name
     app.run(host='0.0.0.0')

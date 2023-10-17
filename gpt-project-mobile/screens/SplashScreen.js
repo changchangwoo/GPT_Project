@@ -11,7 +11,7 @@ export default function App() {
 
     const sendTextToServer = async () => {
         try {
-            const apiUrl = 'http://172.30.1.84:5000/ask'; // Flask 서버의 엔드포인트 URL로 대체
+            const apiUrl = 'http://192.168.132.140:5000/ask'; // Flask 서버의 엔드포인트 URL로 대체
 
             const response = await axios.post(apiUrl, { text });
 
@@ -48,7 +48,7 @@ export default function App() {
 
     // 이미지를 Flask 서버로 업로드
     const uploadImage = async (uri) => {
-        const apiUrl = 'http://172.30.1.84:5000/upload'; // Flask 서버의 엔드포인트 URL로 대체
+        const apiUrl = 'http://192.168.132.140:5000/upload'; // Flask 서버의 엔드포인트 URL로 대체
 
         const formData = new FormData();
         formData.append('image', {
