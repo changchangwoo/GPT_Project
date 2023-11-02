@@ -21,7 +21,6 @@ const FontLoader = ({ children }) => {
     }, []);
 
     if (!fontLoaded) {
-        // 폰트가 로드되지 않았을 때 로딩 화면 등을 표시할 수 있습니다.
         return <LoadingScreen />
     }
 

@@ -127,6 +127,7 @@ def ask_gpt():
     print(answer)
     return answer
 
+# 대화 시작(스크립트, 닉네임, 성격 부여)
 @app.route('/start', methods=['POST'])
 def start_chat():
     global obj_name,personal, mood, message

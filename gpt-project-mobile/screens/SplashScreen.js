@@ -20,7 +20,7 @@ export default function App( { navigation }) {
 
     const NavChatScreen = async () => {
         try {
-            const response = await axios.post('http://172.30.1.70:5000/start');
+            const response = await axios.post('http://172.29.51.21:5000/start');
             const obj = response.data
             console.log(obj)
             if(obj.obj_name == null) {
@@ -49,7 +49,7 @@ export default function App( { navigation }) {
 
     // 이미지를 Flask 서버로 업로드
     const uploadImage = async (uri) => {
-        const apiUrl = 'http://172.30.1.70:5000/upload'; // Flask 서버의 엔드포인트 URL로 대체
+        const apiUrl = 'http://172.29.51.21:5000/upload'; // Flask 서버의 엔드포인트 URL로 대체
 
         const formData = new FormData();
         formData.append('image', {
@@ -94,9 +94,10 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
+        backgroundColor: '#B0E0E6'
     },
     button: {
-        backgroundColor: 'blue',
+        backgroundColor: '#D5EAE3',
         padding: 10,
         borderRadius: 5,
         marginTop: 20,
