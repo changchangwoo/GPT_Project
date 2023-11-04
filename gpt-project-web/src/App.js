@@ -12,7 +12,7 @@ function InputForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const result = await axios.post('http://localhost:5000/ask', {
+      const result = await axios.post('http://localhost:5555/ask', {
         text: inputText
       });
       console.log(result.data.answer)

@@ -16,7 +16,7 @@ function ChatScreen({ navigation, route }) {
 
             try {
                 // 서버로 메시지를 보내고 응답을 받는 부분
-                const response = await axios.post('http://172.29.51.21:5000/ask', { text: inputText });
+                const response = await axios.post('http://192.168.25.17:5555/ask', { text: inputText });
                 const botReply = response.data;
                 // 봇의 응답을 추가
                 addMessage(botReply, false);

@@ -4,7 +4,7 @@ import * as ImagePicker from 'expo-image-picker';
 import axios from 'axios';
 import { TextInput } from 'react-native-gesture-handler';
 
-export default function App( { navigation }) {
+export default function App({ navigation }) {
     const [image, setImage] = useState(null);
     const [text, setText] = useState('');
 
@@ -20,14 +20,15 @@ export default function App( { navigation }) {
 
     const NavChatScreen = async () => {
         try {
-            const response = await axios.post('http://172.29.51.21:5000/start');
+            const response = await axios.post('http://192.168.25.17:5555/start');
             const obj = response.data
             console.log(obj)
-            if(obj.obj_name == null) {
+            if (obj.obj_name == null) {
                 console.log(obj.obj_name)
                 Alert.alert('이미지 식별 불가능')
             } else {
-            navigation.navigate('Chat', { obj_data: response.data }) }
+                navigation.navigate('Chat', { obj_data: response.data })
+            }
         } catch (error) {
             console.error('Error sending message:', error);
         }
