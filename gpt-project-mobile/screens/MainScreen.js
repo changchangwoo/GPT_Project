@@ -1,8 +1,68 @@
-import React, { useEffect } from 'react';
-import { View, Text, Button, TouchableOpacity, Image } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, TouchableOpacity, Image, Alert } from 'react-native';
 import { main_style } from '../styles/CSS';
+import * as ImagePicker from 'expo-image-picker';
+import axios from 'axios';
+
 
 const MainScreen = ({ navigation }) => {
+    const [selectedImage, setSelectedImage] = useState(null);
+
+    const selectImageFromGallery = async () => {
+        const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+        if (permissionResult.granted === false) {
+            alert('갤러리 접근 권한이 필요합니다!');
+            return;
+        }
+
+        const result = await ImagePicker.launchImageLibraryAsync();
+
+        if (result.canceled === false) {
+            if (result.assets && result.assets.length > 0) {
+                setSelectedImage(result.assets[0].uri);
+            }
+        }
+    };
+
+    const takePicture = async () => {
+        const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
+
+        if (permissionResult.granted === false) {
+            alert('카메라 접근 권한이 필요합니다!');
+            return;
+        }
+
+        const result = await ImagePicker.launchCameraAsync();
+
+        if (result.canceled === false) {
+            setSelectedImage(result.assets[0].uri);
+        }
+    };
+
+    const uploadImage = async () => {
+        const apiUrl = 'http://192.168.0.7:5555/upload'; // Flask 서버의 엔드포인트 URL로 대체
+    
+        const formData = new FormData();
+        formData.append('image', {
+            uri: selectedImage, // 이미지 파일의 URI를 사용
+            name: 'image.jpg',
+            type: 'image/jpg',
+        });
+    
+        try {
+            const response = await axios.post(apiUrl, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+            console.log('이미지 업로드 성공:', response.data);
+            navigation.navigate('Profile', {img : selectedImage})
+        } catch (error) {
+            Alert.alert('물체를 식별할 수 없어요.')
+            console.error('이미지 업로드 실패:', error);
+        }
+    };
 
     useEffect(() => {
         navigation.setOptions({
@@ -13,11 +73,11 @@ const MainScreen = ({ navigation }) => {
             },
             headerStyle: {
                 backgroundColor: 'white',
+                borderBottomWidth: 1, // 네비게이션 바 하단에 선을 추가
+                borderBottomColor: '#d3d3d3', // 선의 색상
             },
-            headerTitleAlign: 'center', // 가운데 정렬 추가
-            headerShadowVisible: false, // 헤더 아래 선을 제거
+            headerTitleAlign: 'center',
         });
-
     }, [navigation]);
 
     return (
@@ -33,32 +93,29 @@ const MainScreen = ({ navigation }) => {
             </View>
             <View style={main_style.main_container}>
                 <Image
-                    source={require('../assets/imgs/main_image.png')} // 이미지 경로 설정
+                    source={{ uri: selectedImage }}
                     style={main_style.main_image}
                 />
             </View>
             <View style={main_style.low_container}>
-                <TouchableOpacity style={main_style.btn}>
+                <TouchableOpacity style={main_style.btn} onPress={takePicture}>
                     <Text style={main_style.start_text}>카메라 촬영</Text>
                     <Image
-                        source={require('../assets/icons/camera.png')} // 이미지 경로 설정
+                        source={require('../assets/icons/camera.png')}
                         style={main_style.icon_camera}
                     />
                 </TouchableOpacity>
-                <TouchableOpacity style={main_style.btn}>
+                <TouchableOpacity style={main_style.btn} onPress={selectImageFromGallery}>
                     <Text style={main_style.start_text}>이미지 업로드</Text>
                     <Image
-                        source={require('../assets/icons/gallery.png')} // 이미지 경로 설정
+                        source={require('../assets/icons/gallery.png')}
                         style={main_style.icon_gallery}
                     />
                 </TouchableOpacity>
-                <TouchableOpacity style={main_style.recognize_btn}>
+                <TouchableOpacity style={main_style.recognize_btn} onPress={uploadImage}>
                     <Text style={main_style.start_text}>새 친구 만나기</Text>
                 </TouchableOpacity>
-
             </View>
-
-
         </View>
     );
 };

@@ -6,6 +6,7 @@ import SplashScreen from './screens/SplashScreen';
 import ChatScreen from './screens/ChatScreen';
 import IntroScreen from './screens/IntroScreen';
 import MainScreen from './screens/MainScreen';
+import ProfileScreen from './screens/ProfileScreen';
 
 const Stack = createStackNavigator();
 
@@ -19,6 +20,7 @@ export default function App() {
           <Stack.Screen name="Chat" component={ChatScreen} options={{ headerShown: false }} />
           <Stack.Screen name="Intro" component={IntroScreen} options={{ headerShown: false }} />
           <Stack.Screen name="Main" component={MainScreen}/>
+          <Stack.Screen name="Profile" component={ProfileScreen}/>
         </Stack.Navigator>
       </FontLoader>
     </NavigationContainer>

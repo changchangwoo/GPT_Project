@@ -23,8 +23,7 @@ personal_array = ["charismatic", "persuasive", "influential", "charming", "convi
 mood_array = ["happy", "sad", "angry", "anxious", "surprised", "irritated", "listless", "excited",
               "calm", "tired", "dissatisfied", "curious"]
 
-personal = random.choice(personal_array)
-mood = random.choice(mood_array)
+
 
 # YOLO 모델 로드
 net = cv2.dnn.readNet("yolov4.weights", "yolov4.cfg")
@@ -131,6 +130,9 @@ def ask_gpt():
 @app.route('/start', methods=['POST'])
 def start_chat():
     global obj_name,personal, mood, message
+    personal = random.choice(personal_array)
+    mood = random.choice(mood_array)
+
     message = []
     print(obj_name, personal, mood)
     response = openai.ChatCompletion.create(
