@@ -166,11 +166,13 @@ export const main_style = StyleSheet.create({
 export const profile_style = StyleSheet.create({
     container: {
         flex: 1,
+        width: '100%',
+        height: '100%',
         flexDirection: 'column',
         alignItems: 'center',
         backgroundColor: '#F7F7F7',
     },
-    top_container : {
+    top_container: {
         width: '100%',
         height: '45%',
         alignItems: 'center',
@@ -202,18 +204,19 @@ export const profile_style = StyleSheet.create({
         marginTop: 5
     },
 
-    middle_container : {
+    middle_container: {
         width: '100%',
         height: '10%',
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center'
     },
-    personal_box : {
+    personal_box: {
         width: '30%',
         height: 30,
         backgroundColor: '#F5ECF9',
         marginHorizontal: 20,
+        marginTop: 30,
         borderRadius: 10,
         justifyContent: 'center',
 
@@ -224,7 +227,7 @@ export const profile_style = StyleSheet.create({
         color: 'black',
         textAlign: 'center',
     },
-    low_container : {
+    low_container: {
         width: '100%',
         height: '50%',
         borderTopLeftRadius: 30,
@@ -233,15 +236,15 @@ export const profile_style = StyleSheet.create({
         marginTop: 20,
         padding: 20
     },
-    text_box : {
+    text_box: {
         width: '100%',
         height: '60%',
-        marginTop: 30
+        marginTop: 10
     },
     text_descript: {
         color: 'white',
         fontFamily: 'NEXON_MEDIUM',
-        fontSize: style.font_size_medium,
+        fontSize: style.font_size_small,
         textAlign: 'center'
     },
     start_btn: {
@@ -251,7 +254,6 @@ export const profile_style = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         borderRadius: 10,
-        marginBottom: 20
     },
     start_text: {
         fontFamily: 'NEXON_LIGHT',
@@ -259,5 +261,25 @@ export const profile_style = StyleSheet.create({
         color: 'white',
         textAlign: 'center',
     },
+    loading_image: {
+        width: 300,
+        height: 300,
+        resizeMode: 'contain', // 이미지 비율 유지
+    },
+    loading_container: {
+        flex: 1,
+        width: '100%',
+        height: '100%',
+        backgroundColor: '#F7F7F7',
+        justifyContent: 'center',
+        alignContent: 'center',
+        alignItems: 'center',
+    },
+    loading_text: {
+        marginTop: 70,
+        fontSize: style.font_size_medium,
+        fontFamily: 'NEXON_LIGHT',
+        textAlign: 'center'
+    }
 
 })

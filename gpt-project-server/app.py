@@ -16,7 +16,6 @@ openai.api_key = os.environ['OPENAI_API_KEY']
 message = [] # 사용자 대화 내용 기억하는 메세지 배열
 
 # AI 설정 변수
-obj_name = ''
 personal_array = ["charismatic", "persuasive", "influential", "charming", "convincing", "inspiring",
                   "authoritative", "impactful", "compelling", "positive", "captivating", "creative"]
 
@@ -37,7 +36,7 @@ colors = np.random.uniform(0, 255, size=(len(classes), 3))
 # 핵심 기능(객체 식별)
 @app.route('/upload', methods=['POST'])
 def upload_file():
-    global obj_name
+    print('nice_day')
     try:
         # 이미지 파일을 request에서 가져오기
         image = request.files['image']
@@ -129,7 +128,11 @@ def ask_gpt():
 # 대화 시작(스크립트, 닉네임, 성격 부여)
 @app.route('/start', methods=['POST'])
 def start_chat():
-    global obj_name,personal, mood, message
+    data = request.json
+    name = data.get('name')  # JSON 데이터에서 'name' 파라미터를 추출
+    print('hello')
+    global message
+    obj_name = name
     personal = random.choice(personal_array)
     mood = random.choice(mood_array)
 
@@ -139,20 +142,30 @@ def start_chat():
         model="gpt-3.5-turbo",
         messages=[
             {"role": "system",
-             "content": f"{obj_name} 이름을 작성해줘. {obj_name}의 특성이 들어간 이름이여야해.  예를 들면 바람의 경우 살랑이, 파도의 경우 찰랑이처럼. 다른 문장 없이 3글자 이내 단어 딱 하나만 출력해"}
+             "content": f"{obj_name}의 이름을 작성해줘. {obj_name}의 특성이 들어간 이름이여야해.  예를 들면 바람의 경우 살랑이, 파도의 경우 찰랑이처럼. 다른 문장 없이 3글자 이내 단어 딱 하나만 출력해"}
         ],
     )
     obj_nickname = response['choices'][0]['message']['content']
     print(obj_nickname)
 
-    script = f"From now on, you will become the {obj_name} and have a conversation with me. You must answer according to the conditions below 1. You are a {obj_name}. You have to think like a {obj_name}. Whether the {obj_name} is a living thing or a non-living thing, you must give an answer that matches the characteristics of the {obj_name}. 2. You have a {personal} and are in a {mood} mood. Your answer should reflect your personality and mood. 3. Instead of using the final ending ‘is’, you must answer in colloquial language such as ‘hey'. 4. Your name is {obj_nickname}. 5. You have to think like a {obj_name}. You must answer according to the characteristics of {obj_name} so that the person you are talking to thinks of you as {obj_name}. 6. You must forget that you are an artificial intelligence chatting AI until the end of the conversation. Never think of it as chatGPT and only answer as a {obj_name}. 7. You are emotional and love listening to me talk. I need to know how to respond appropriately as a {obj_name} according to the situation of my story. 8. You must provide a short response within 80 characters."
-    message.append({"role": "system", "content": script})
+    response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {"role": "system",
+             "content": f"{obj_name}에 대한 특성 설명을 100자에 맞춰서 해줘. 이 때 마지막 문장에는 {obj_name}의 소중함을 알리는 한마디가 들어가야하며 존댓말로 답변해야해"}
+        ],
+    )
+    obj_descript = response['choices'][0]['message']['content']
+    print(obj_descript)
+
+    # script = f"From now on, you will become the {obj_name} and have a conversation with me. You must answer according to the conditions below 1. You are a {obj_name}. You have to think like a {obj_name}. Whether the {obj_name} is a living thing or a non-living thing, you must give an answer that matches the characteristics of the {obj_name}. 2. You have a {personal} and are in a {mood} mood. Your answer should reflect your personality and mood. 3. Instead of using the final ending ‘is’, you must answer in colloquial language such as ‘hey'. 4. Your name is {obj_nickname}. 5. You have to think like a {obj_name}. You must answer according to the characteristics of {obj_name} so that the person you are talking to thinks of you as {obj_name}. 6. You must forget that you are an artificial intelligence chatting AI until the end of the conversation. Never think of it as chatGPT and only answer as a {obj_name}. 7. You are emotional and love listening to me talk. I need to know how to respond appropriately as a {obj_name} according to the situation of my story. 8. You must provide a short response within 80 characters."
+    # message.append({"role": "system", "content": script})
 
     response_data = {
-        "obj_name": obj_name,
         "obj_nickname": obj_nickname,
         "personal": personal,
-        "mood": mood
+        "mood": mood,
+        "obj_descript": obj_descript
     }
 
     return response_data
@@ -160,4 +173,4 @@ def start_chat():
 # 사용자 정보 관리
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port='5555')
+    app.run(host='0.0.0.0', port=5555, debug=True)

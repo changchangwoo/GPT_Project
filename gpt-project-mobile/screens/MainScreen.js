@@ -41,15 +41,15 @@ const MainScreen = ({ navigation }) => {
     };
 
     const uploadImage = async () => {
-        const apiUrl = 'http://192.168.0.7:5555/upload'; // Flask 서버의 엔드포인트 URL로 대체
-    
+        const apiUrl = 'http://192.168.25.17:5555/upload'; // Flask 서버의 엔드포인트 URL로 대체
+
         const formData = new FormData();
         formData.append('image', {
             uri: selectedImage, // 이미지 파일의 URI를 사용
             name: 'image.jpg',
             type: 'image/jpg',
         });
-    
+
         try {
             const response = await axios.post(apiUrl, formData, {
                 headers: {
@@ -57,10 +57,13 @@ const MainScreen = ({ navigation }) => {
                 },
             });
             console.log('이미지 업로드 성공:', response.data);
-            navigation.navigate('Profile', {img : selectedImage})
+            if (response.data == '감지된 클래스 없음') {
+                Alert.alert('물체를 식별할 수 없어요')
+            } else {
+                navigation.navigate('Profile', { img: selectedImage, obj_name: response.data.class_name })
+            }
         } catch (error) {
-            Alert.alert('물체를 식별할 수 없어요.')
-            console.error('이미지 업로드 실패:', error);
+            Alert.alert('이미지를 업로드해주세요')
         }
     };
 
