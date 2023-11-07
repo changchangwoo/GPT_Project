@@ -2,8 +2,8 @@ import React from 'react';
 import { View, Text, Button, TouchableOpacity, Image } from 'react-native';
 import { intro_style, style } from '../styles/CSS';
 
-const IntroScreen = ({ navigation }) => {
 
+const IntroScreen = ({ navigation }) => {
     const handle_start = () => {
         console.log('handle_start_clicked')
         navigation.navigate('Main');

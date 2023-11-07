@@ -1,25 +1,74 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Button, ScrollView, StyleSheet } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { View, Text, TextInput, ScrollView, TouchableOpacity, Image, KeyboardAvoidingView, Platform } from 'react-native';
 import axios from 'axios';
+import { chat_style } from '../styles/CSS';
 
 function ChatScreen({ navigation, route }) {
-    const obj_data = route.params.obj_data;
-
     const [messages, setMessages] = useState([]);
     const [inputText, setInputText] = useState('');
+    const [message_box, setMessage_box] = useState([]);
+    const server_url = route.params.server_url;
+    const scrollViewRef = useRef(); // Ref for the ScrollView
+
+    useEffect(() => {
+        const server_url = route.params.server_url
+        const obj_name = route.params.obj_name
+        const obj_nickname = route.params.obj_nickname
+        const mood = route.params.mood
+        const personal = route.params.personal
+
+        navigation.setOptions({
+            title: '채팅화면',
+            headerTitleStyle: {
+                fontFamily: 'NEXON_LIGHT',
+                fontSize: 20,
+            },
+            headerStyle: {
+                backgroundColor: 'white',
+                borderBottomWidth: 1, // 네비게이션 바 하단에 선을 추가
+                borderBottomColor: '#d3d3d3', // 선의 색상
+            },
+            headerTitleAlign: 'center',
+        });
+
+        const setRole = async () => {
+            try {
+                const response = await axios.post(server_url + 'set_role', {
+                    obj_name: obj_name,
+                    obj_nickname: obj_nickname,
+                    mood: mood,
+                    personal: personal
+                });
+
+                if (response.status === 200) {
+                    console.log(response.data);
+                    setMessage_box(response.data.message)
+                } else {
+                    console.log('error');
+                }
+            } catch (error) {
+                console.log(error);
+            }
+        }
+        setRole();
+    }, [navigation]);
 
     const sendMessage = async () => {
         if (inputText) {
-            // 사용자 메시지를 추가
+            scrollViewRef.current.scrollToEnd({ animated: true });
             addMessage(inputText, true);
             setInputText('');
-
             try {
-                // 서버로 메시지를 보내고 응답을 받는 부분
-                const response = await axios.post('http://192.168.25.17:5555/ask', { text: inputText });
-                const botReply = response.data;
-                // 봇의 응답을 추가
+                const response = await axios.post(server_url + 'ask',
+                    {
+                        text: inputText,
+                        message_box: message_box
+                    });
+                const botReply = response.data.answer;
+                setMessage_box(response.data.message_box)
                 addMessage(botReply, false);
+                scrollViewRef.current.scrollToEnd({ animated: true });
+
             } catch (error) {
                 console.error('Error sending message:', error);
             }
@@ -34,58 +83,37 @@ function ChatScreen({ navigation, route }) {
     };
 
     return (
-        <View style={styles.container}>
-            <Text style={{marginVertical: 50, textAlign: 'center'}}> 
-        사물 : {obj_data.obj_name} {'\n'}
-        별명 : {obj_data.obj_nickname}  {'\n'}
-        기분 : {obj_data.mood}  {'\n'}
-        성격 : {obj_data.personal}</Text>
-            <ScrollView style={styles.chatContainer}>
+        <KeyboardAvoidingView
+            style={chat_style.container}
+            behavior={Platform.OS === 'ios' ? 'padding' : null}
+        >
+            <ScrollView
+                style={chat_style.chat_container}
+                ref={scrollViewRef}
+            >
                 {messages.map((message, index) => (
-                    <View key={index} style={message.isUser ? styles.userMessage : styles.botMessage}>
-                        <Text>{message.text}</Text>
+                    <View key={index} style={message.isUser ? chat_style.user_message : chat_style.bot_message}>
+                        <Text style={message.isUser ? chat_style.user_conversation : chat_style.bot_conversation}>{message.text}</Text>
                     </View>
                 ))}
             </ScrollView>
-            <TextInput
-                style={styles.input}
-                placeholder="Type a message..."
-                value={inputText}
-                onChangeText={(text) => setInputText(text)}
-            />
-            <Button title="Send" onPress={sendMessage} />
-        </View>
+            <View style={chat_style.input_container}>
+                <TextInput
+                    style={chat_style.input}
+                    placeholder="메세지를 입력하세요"
+                    value={inputText}
+                    onChangeText={(text) => setInputText(text)}
+                />
+                <TouchableOpacity style={chat_style.send_btn}
+                    onPress={sendMessage}>
+                    <Image
+                        source={require('../assets/icons/send.png')}
+                        style={chat_style.icon_send}
+                    />
+                </TouchableOpacity>
+
+            </View>
+        </KeyboardAvoidingView>
     );
 }
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        padding: 16,
-    },
-    chatContainer: {
-        flex: 1,
-    },
-    userMessage: {
-        backgroundColor: 'lightblue',
-        alignSelf: 'flex-start',
-        margin: 8,
-        padding: 8,
-        borderRadius: 8,
-    },
-    botMessage: {
-        backgroundColor: 'lightgreen',
-        alignSelf: 'flex-end',
-        margin: 8,
-        padding: 8,
-        borderRadius: 8,
-    },
-    input: {
-        height: 40,
-        borderWidth: 1,
-        borderColor: 'gray',
-        marginBottom: 8,
-    },
-});
-
 export default ChatScreen;

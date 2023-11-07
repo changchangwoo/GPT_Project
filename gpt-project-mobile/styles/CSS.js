@@ -283,3 +283,85 @@ export const profile_style = StyleSheet.create({
     }
 
 })
+
+export const chat_style = StyleSheet.create({
+    container: {
+        flex: 1,
+        width: '100%',
+        height: '100%',
+        flexDirection: 'column',
+        alignItems: 'center',
+        backgroundColor: '#F7F7F7',
+    },
+    chat_container: {
+        width: '100%',
+        height: '90%',
+        flex: 1,
+    },
+    user_conversation : {
+        color: 'white',
+        fontFamily: 'NEXON_LIGHT',
+        fontSize: style.font_size_small
+        
+    },
+    bot_conversation : {
+        color: 'black',
+        fontFamily: 'NEXON_LIGHT',
+        fontSize: style.font_size_small 
+    },
+    user_message: {
+        backgroundColor: '#7E506C',
+        alignSelf: 'flex-end',
+        margin: 5,  
+        padding: 10,
+        justifyContent: 'center',
+        borderRadius: 8,
+        fontFamily: 'NEXON_LIGHT',
+        color: 'white'
+    },
+    bot_message: {
+        backgroundColor: 'white',
+        alignSelf: 'flex-start',
+        margin: 5,  
+        padding: 10,
+        justifyContent: 'center',
+        borderRadius: 8,
+        fontFamily: 'NEXON_LIGHT',
+        color: 'black',
+        borderWidth: 1,
+        borderColor: 'grey'
+    },
+    input: {
+        height: 50,
+        width: '80%',
+        borderRadius: 10,
+        borderWidth: 1,
+        borderColor: 'gray',
+        marginBottom: 8,
+        fontSize: style.font_size_medium,
+        fontFamily: 'NEXON_LIGHT',
+        padding: 10
+    },
+    input_container : {
+        width: '100%',
+        height: 60,
+        flexDirection: 'row',
+        paddingLeft: 10,
+        paddingRight: 20,
+    }, 
+    send_btn : {
+        width: '20%',
+        height: 50,
+        borderRadius: 20,
+        backgroundColor: '#7E506C',
+        marginHorizontal: 10,
+        alignContent: 'center',
+        alignItems: 'center',
+        justifyContent: 'center'
+    },
+    icon_send: {
+        width: 32,
+        height: 32,
+        justifyContent: 'center',
+    },
+})

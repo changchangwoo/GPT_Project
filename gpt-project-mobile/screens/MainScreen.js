@@ -4,9 +4,9 @@ import { main_style } from '../styles/CSS';
 import * as ImagePicker from 'expo-image-picker';
 import axios from 'axios';
 
-
 const MainScreen = ({ navigation }) => {
     const [selectedImage, setSelectedImage] = useState(null);
+    const server_url = 'http://172.30.1.76:5555/'
 
     const selectImageFromGallery = async () => {
         const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -41,7 +41,7 @@ const MainScreen = ({ navigation }) => {
     };
 
     const uploadImage = async () => {
-        const apiUrl = 'http://192.168.25.17:5555/upload'; // Flask 서버의 엔드포인트 URL로 대체
+        const apiUrl = server_url+'upload'; // Flask 서버의 엔드포인트 URL로 대체
 
         const formData = new FormData();
         formData.append('image', {
@@ -60,7 +60,7 @@ const MainScreen = ({ navigation }) => {
             if (response.data == '감지된 클래스 없음') {
                 Alert.alert('물체를 식별할 수 없어요')
             } else {
-                navigation.navigate('Profile', { img: selectedImage, obj_name: response.data.class_name })
+                navigation.navigate('Profile', { img: selectedImage, obj_name: response.data.class_name, server_url: server_url })
             }
         } catch (error) {
             Alert.alert('이미지를 업로드해주세요')

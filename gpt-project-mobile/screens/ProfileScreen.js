@@ -6,6 +6,7 @@ import axios from 'axios';
 
 
 const ProfileScreen = ({ navigation, route }) => {
+    const server_url = route.params.server_url
     const [img, setImage] = useState(null);
     const [obj_name, setObj_name] = useState('');
     const [mood, setMood] = useState('');
@@ -37,7 +38,7 @@ const ProfileScreen = ({ navigation, route }) => {
             const name = route.params.obj_name;
             console.log(name);
             try {
-                const response = await axios.post('http://192.168.25.17:5555/start', {
+                const response = await axios.post(server_url+'start', {
                     name: name,
                 });
 
@@ -59,6 +60,10 @@ const ProfileScreen = ({ navigation, route }) => {
         };
         setProfile();
     }, [navigation]);
+
+    const NavChatScreen = () => {
+        navigation.navigate('Chat', { img: img, obj_name: obj_name, mood: mood, obj_nickname: obj_nickname, personal: personal, server_url: server_url })
+    };
 
     if (isLoading) {
         return (
@@ -116,7 +121,8 @@ const ProfileScreen = ({ navigation, route }) => {
                         {obj_descript}
                     </Text>
                 </View>
-                <TouchableOpacity style={profile_style.start_btn}>
+                <TouchableOpacity style={profile_style.start_btn}
+                onPress={NavChatScreen}>
                     <Text style={profile_style.start_text}>대화 시작하기</Text>
                 </TouchableOpacity>
             </View>
