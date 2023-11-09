@@ -4,11 +4,16 @@ import { intro_style, style } from '../styles/CSS';
 
 
 const IntroScreen = ({ navigation }) => {
-    const handle_start = () => {
-        console.log('handle_start_clicked')
-        navigation.navigate('Main');
+    const server_url = 'http://192.168.25.17:5555/'
 
+    const handle_anonymous = () => {
+        navigation.navigate('Main', { server_url: server_url });
     }
+    const handle_login = () => {
+        navigation.navigate('Login', { server_url: server_url });
+    }
+
+
     return (
         <View style={intro_style.container}>
             <View style={intro_style.top_container}>
@@ -28,12 +33,12 @@ const IntroScreen = ({ navigation }) => {
             </View>
             <View style={intro_style.low_container}>
                 <TouchableOpacity style={intro_style.start_btn}
-                    onPress={handle_start}>
+                    onPress={handle_login}>
                     <Text style={intro_style.start_text}>시작하기</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={intro_style.register_btn}
-                    onPress={handle_start}>
-                    <Text style={intro_style.start_text}>회원가입</Text>
+                    onPress={handle_anonymous}>
+                    <Text style={intro_style.start_text}>비회원으로 시작하기</Text>
                 </TouchableOpacity>
             </View>
         </View>

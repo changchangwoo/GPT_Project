@@ -1,15 +1,26 @@
-from flask import Flask, request, session
+from flask import Flask, request, session, jsonify
 from flask_cors import CORS
+from dotenv import load_dotenv
 import openai  # ChatGPT API를 사용하기 위한 라이브러리
 import cv2
 import numpy as np
 import os
 import random
+from flask_mysqldb import MySQL
+
 import json
 
+load_dotenv() # 환경변수 파일 생성
 app = Flask(__name__)
 app.secret_key = 'sk55'
 CORS(app)
+
+# 데이터베이스 정보
+app.config['MYSQL_HOST'] = os.environ.get('MYSQL_HOST')
+app.config['MYSQL_USER'] = os.environ.get('MYSQL_USER')
+app.config['MYSQL_PASSWORD'] = os.environ.get('MYSQL_PASSWORD')
+app.config['MYSQL_DB'] = os.environ.get('MYSQL_DB')
+mysql = MySQL(app)
 
 # ChatGPT API 키 설정
 openai.api_key = os.environ['OPENAI_API_KEY']
@@ -183,10 +194,84 @@ def start_chat():
         "mood": mood,
         "obj_descript": obj_descript
     }
-
     return response_data
 
 # 사용자 정보 관리
+@app.route('/login', methods=['POST'])
+def login():
+    username = request.json['id']
+    password = request.json['pw']
+
+    cur = mysql.connection.cursor()
+    cur.execute("SELECT * FROM userprofile WHERE userid = %s AND userpw = %s", (username, password))
+    user = cur.fetchone()
+    cur.close()
+
+    if user:
+        # 로그인 성공
+        return '로그인 성공'
+    else:
+        # 로그인 실패
+        return '로그인 실패'
+
+@app.route('/register', methods=['POST'])
+def register():
+    # 전달된 아이디와 비밀번호 가져오기
+    data = request.get_json()
+    id = data['id']
+    pw = data['pw']
+
+    # 중복 아이디 확인
+    cur = mysql.connection.cursor()
+    query = "SELECT * FROM userprofile WHERE userid = %s"
+    cur.execute(query, (id,))
+    existing_user = cur.fetchone()
+
+    if existing_user:
+        return '중복'
+
+    # 회원가입
+    query = "INSERT INTO userprofile (userid, userpw) VALUES (%s, %s)"
+    cur.execute(query, (id, pw))
+    mysql.connection.commit()
+    cur.close()
+
+    return '성공'
+
+@app.route('/get_list', methods=['POST'])
+def get_data():
+    data = request.get_json()
+    user_id = data['user_id']
+
+    print(user_id)
+    cur = mysql.connection.cursor()
+
+    # 데이터베이스에서 특정 사용자 ID에 해당하는 데이터를 조회하는 SELECT 쿼리문
+    query = "SELECT * FROM userdata WHERE userid = %s"
+    cur.execute(query, (user_id,))
+
+    data = cur.fetchall()
+    cur.close()
+
+    data_list = []
+    for row in data:
+        data_dict = {
+            'userid': row[1],
+            'name': row[2],
+            'nickname': row[3],
+            'mood': row[4],
+            'personal': row[5],
+            'message_box': row[6],
+            'img': row[7],
+            'date': row[8],
+
+            # 필요한 다른 컬럼들도 추가 가능
+        }
+        data_list.append(data_dict)
+
+    return data_list
+
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5555, debug=True)

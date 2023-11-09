@@ -4,9 +4,10 @@ import { main_style } from '../styles/CSS';
 import * as ImagePicker from 'expo-image-picker';
 import axios from 'axios';
 
-const MainScreen = ({ navigation }) => {
+const MainScreen = ({ navigation, route }) => {
     const [selectedImage, setSelectedImage] = useState(null);
-    const server_url = 'http://172.30.1.76:5555/'
+    const server_url = route.params.server_url
+    const user_id = route.params.user_id
 
     const selectImageFromGallery = async () => {
         const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -41,7 +42,7 @@ const MainScreen = ({ navigation }) => {
     };
 
     const uploadImage = async () => {
-        const apiUrl = server_url+'upload'; // Flask 서버의 엔드포인트 URL로 대체
+        const apiUrl = server_url + 'upload'; // Flask 서버의 엔드포인트 URL로 대체
 
         const formData = new FormData();
         formData.append('image', {
