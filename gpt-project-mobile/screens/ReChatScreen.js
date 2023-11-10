@@ -3,7 +3,7 @@ import { View, Text, TextInput, ScrollView, TouchableOpacity, Image, KeyboardAvo
 import axios from 'axios';
 import { chat_style } from '../styles/CSS';
 
-function ChatScreen({ navigation, route }) {
+function ReChatScreen({ navigation, route }) {
     const [messages, setMessages] = useState([]);
     const [inputText, setInputText] = useState('');
     const [message_box, setMessage_box] = useState([]);
@@ -18,18 +18,27 @@ function ChatScreen({ navigation, route }) {
 
     useEffect(() => {
         const server_url = route.params.server_url
-        const obj_name = route.params.obj_name
-        const obj_nickname = route.params.obj_nickname
-        const mood = route.params.mood
-        const personal = route.params.personal
-        const user_id = route.params.user_id
-        const img = route.params.img
-        const obj_descript = route.params.obj_descript
+        const data = route.params.item
+        const obj_name = data.name
+        const obj_nickname = data.nickname
+        const user_id = data.userid
+        const message = data.message_box
+        const messages = data.messages
 
         setUser_id(user_id)
         setObj_name(obj_name)
         setObj_nickname(obj_nickname)
-        setObj_descirpt(obj_descript)
+
+        axios
+            .post(server_url + 'change_message', { message: message, messages: messages })
+            .then((response) => {
+                console.log(response.data.messages)
+                setMessages(response.data.messages)
+
+            })
+            .catch((error) => {
+                console.error(error);
+            });
 
         navigation.setOptions({
             title: '채팅화면',
@@ -45,28 +54,6 @@ function ChatScreen({ navigation, route }) {
             headerTitleAlign: 'center',
         });
 
-        const setRole = async () => {
-            try {
-                const response = await axios.post(server_url + 'set_role', {
-                    user_id: user_id, // obj_id를 데이터에 추가
-                    obj_name: obj_name,
-                    obj_nickname: obj_nickname,
-                    mood: mood,
-                    personal: personal,
-                    obj_descript: obj_descript,
-                    img: img
-                });
-
-                if (response.status === 200) {
-                    setMessage_box(response.data.message);
-                } else {
-                    console.log('error');
-                }
-            } catch (error) {
-                console.log(error);
-            }
-        }
-        setRole();
     }, [navigation]);
 
     const sendMessage = async () => {
@@ -81,8 +68,7 @@ function ChatScreen({ navigation, route }) {
                         obj_name: obj_name,
                         obj_nickname: obj_nickname,
                         text: inputText,
-                        message_box: message_box,
-                        messages: messages
+                        message_box: message_box
                     });
                 const botReply = response.data.answer;
                 setMessage_box(response.data.message_box)
@@ -136,4 +122,4 @@ function ChatScreen({ navigation, route }) {
         </KeyboardAvoidingView>
     );
 }
-export default ChatScreen;
+export default ReChatScreen;

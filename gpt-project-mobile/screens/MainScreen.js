@@ -61,7 +61,7 @@ const MainScreen = ({ navigation, route }) => {
             if (response.data == '감지된 클래스 없음') {
                 Alert.alert('물체를 식별할 수 없어요')
             } else {
-                navigation.navigate('Profile', { img: selectedImage, obj_name: response.data.class_name, server_url: server_url })
+                navigation.navigate('Profile', { img: selectedImage, obj_name: response.data.class_name, server_url: server_url, user_id: user_id })
             }
         } catch (error) {
             Alert.alert('이미지를 업로드해주세요')

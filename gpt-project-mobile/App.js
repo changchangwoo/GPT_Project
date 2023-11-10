@@ -8,6 +8,7 @@ import MainScreen from './screens/MainScreen';
 import ProfileScreen from './screens/ProfileScreen';
 import LoginScreen from './screens/LoginScreen';
 import ListScreen from './screens/ListScreen';
+import ReChatScreen from './screens/ReChatScreen';
 
 const Stack = createStackNavigator();
 
@@ -23,6 +24,8 @@ export default function App() {
           <Stack.Screen name="Profile" component={ProfileScreen} />
           <Stack.Screen name="Login" component={LoginScreen} />
           <Stack.Screen name="List" component={ListScreen} />
+          <Stack.Screen name="ReChat" component={ReChatScreen} />
+
         </Stack.Navigator>
       </FontLoader>
     </NavigationContainer>

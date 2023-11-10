@@ -469,9 +469,32 @@ export const list_style = StyleSheet.create({
         height: '12%',
         borderBottomWidth: 1,
         borderBottomColor: '#cccccc',
+    },
+    contents_container: {
+        width: '100%',
+        height: '100%',
         flexDirection: 'row'
     },
 
+    opacityReducedContainer: {
+        opacity: 0.3, // 원하는 값을 사용하세요.
+
+    },
+    delete_container: {
+        width: '100%',
+        height: '100%',
+        justifyContent: 'center',
+        zIndex: 1,
+        backgroundColor: 'orange'
+
+    },
+    delete_button: {
+        height: '100%',
+        backgroundColor: 'yellow',
+
+        zIndex: 1
+    }
+    ,
     circle: {
         width: 55,
         height: 55,
@@ -531,6 +554,27 @@ export const list_style = StyleSheet.create({
     add_text: {
         fontFamily: 'NEXON_LIGHT',
         fontSize: style.font_size_medium
+    },
+    delete_container: {
+        marginTop: 20,
+        borderRadius: 10,
+        width: '80%',
+        height: 40,
+        backgroundColor: '#7E506C',
+        alignItems: 'center',
+        borderWidth: 1,
+        borderColor: '#CCCCCC',
+        justifyContent: 'center'
+    },
+    delete_text: {
+        fontFamily: 'NEXON_LIGHT',
+        fontSize: style.font_size_small,
+        color: 'white'
+    },
+    delete_descript: {
+        fontFamily: 'NEXON_LIGHT',
+        fontSize: style.font_size_small,
+        marginTop: 10
     }
 
 
