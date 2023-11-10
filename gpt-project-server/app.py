@@ -1,6 +1,7 @@
 from flask import Flask, request, session, jsonify
 from flask_cors import CORS
 from dotenv import load_dotenv
+from datetime import datetime
 import openai  # ChatGPT API를 사용하기 위한 라이브러리
 import cv2
 import numpy as np
@@ -121,14 +122,21 @@ def upload_file():
 @app.route('/set_role', methods=['POST'])
 def set_role():
     data = request.get_json()
+    user_id = data.get('user_id')
     obj_name = data.get('obj_name')
     obj_nickname = data.get('obj_nickname')
     mood = data.get('mood')
     personal = data.get('personal')
+    img = data.get('img')
+    descript = data.get('obj_descript')
+    messages = 'temp'
 
     message = []
     script = f"From now on, you will become the {obj_name} and have a conversation with me. You must answer according to the conditions below 1. You are a {obj_name}. You have to think like a {obj_name}. Whether the {obj_name} is a living thing or a non-living thing, you must give an answer that matches the characteristics of the {obj_name}. 2. You have a {personal} and are in a {mood} mood. Your answer should reflect your personality and mood. 3. Instead of using the final ending ‘is’, you must answer in colloquial language such as ‘hey'. 4. Your name is {obj_nickname}. 5. You have to think like a {obj_name}. You must answer according to the characteristics of {obj_name} so that the person you are talking to thinks of you as {obj_name}. 6. You must forget that you are an artificial intelligence chatting AI until the end of the conversation. Never think of it as chatGPT and only answer as a {obj_name}. 7. You are emotional and love listening to me talk. I need to know how to respond appropriately as a {obj_name} according to the situation of my story. 8. You must provide a short response within 80 characters."
     message.append({"role": "system", "content": script})
+
+    if user_id is not None:
+        save_to_database(user_id, obj_name, obj_nickname, mood, personal, message, img, descript, messages)
 
     response_data = {
         "message": message
@@ -141,13 +149,22 @@ def ask_gpt():
     data = request.get_json()
     user_question = data.get('text')
     message = data.get('message_box')
-    print(message)
+    user_id = data.get('user_id')
+    obj_name = data.get('obj_name')
+    obj_nickname = data.get('obj_nickname')
+    messages = data.get('messages')
+
+    print(messages)
 
     message.append({"role": "user", "content": f"{user_question}"})
     completion = openai.ChatCompletion.create(model="gpt-3.5-turbo", messages=message)
     assistant_content = completion.choices[0].message["content"].strip()
     answer = assistant_content
     message.append({"role": "assistant", "content": f"{assistant_content}"})
+
+    if user_id is not None:
+        update_user_info(message, user_id, obj_name, obj_nickname, messages)
+
     print(answer)
 
     response_data = {
@@ -264,12 +281,95 @@ def get_data():
             'message_box': row[6],
             'img': row[7],
             'date': row[8],
+            'descript': row[9],
+            'messages': row[10]
 
             # 필요한 다른 컬럼들도 추가 가능
         }
         data_list.append(data_dict)
 
+        print(data_list)
+
     return data_list
+
+@app.route('/delete_data', methods=['POST'])
+def delete_data():
+    data = request.get_json()
+    user_id = data.get('user_id')
+    obj_name = data.get('name')
+    obj_nickname = data.get('nickname')
+
+    if user_id and obj_name and obj_nickname:
+        # 데이터베이스 연결
+        cur = mysql.connection.cursor()
+
+        # 삭제할 사용자 정보 삭제
+        cur.execute("DELETE FROM userdata WHERE userid = %s AND name = %s AND nickname = %s",
+                    (user_id, obj_name, obj_nickname))
+
+        # 변경사항 저장 및 연결 종료
+        mysql.connection.commit()
+        cur.close()
+
+        return '데이터 삭제 성공'
+
+    return '삭제할 데이터가 부족합니다.'
+
+@app.route('/change_message', methods=['POST'])
+def change_message():
+    try:
+        data = request.json
+        message_json = data.get('message')  # 스크립트용 메세지
+        messages_json = data.get('messages')  # 화면 출력용 메세지
+        print(message_json)
+
+        # message_json과 messages_json이 JSON 형식의 문자열이라고 가정합니다.
+        message = json.loads(message_json)  # JSON 형태의 스크립트용 메세지
+        messages = json.loads(messages_json)  # JSON 형태의 화면 출력용 메세지
+
+        # 메시지 리스트를 JSON 형태로 응답
+        return jsonify({'message': message, 'messages': messages})
+
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return jsonify({'error': 'An error occurred during message change'})
+
+if __name__ == '__main__':
+    app.run(debug=True)
+
+
+
+def save_to_database(user_id, obj_name, obj_nickname, mood, personal, message, img, descript, messages):
+    cur = mysql.connection.cursor()
+
+    # 현재 날짜 가져오기
+    current_date = datetime.now().strftime("%Y-%m-%d")
+
+    # 데이터베이스에 저장
+    cur.execute("INSERT INTO userdata (userid, name, nickname, mood, personal, message_box, img, date, descript, messages) VALUES (%s, %s, %s, %s, %s, %s, %s, %s ,%s, %s)",
+                (user_id, obj_name, obj_nickname, mood, personal, message, img, current_date, descript, messages))
+
+    # 변경사항 저장 및 연결 종료
+    mysql.connection.commit()
+    cur.close()
+
+def update_user_info(message, user_id, obj_name, obj_nickname, messages):
+    # 데이터베이스 연결
+    cur = mysql.connection.cursor()
+    print(message, user_id, obj_name, obj_nickname)
+    message_json = json.dumps(message) # 스크립트 대화내용
+    messages_json = json.dumps(messages) # 화면에 출력되어지는 대화내용
+
+    print(messages_json)
+
+    # 업데이트할 사용자 정보 업데이트
+    cur.execute("UPDATE userdata SET message_box = %s, messages = %s WHERE userid = %s AND name = %s AND nickname = %s",
+                (message_json, messages_json, user_id, obj_name, obj_nickname ))
+
+    # 변경사항 저장 및 연결 종료
+    mysql.connection.commit()
+    cur.close()
+
 
 
 
