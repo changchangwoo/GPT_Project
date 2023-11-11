@@ -4,7 +4,7 @@ import { intro_style, style } from '../styles/CSS';
 
 
 const IntroScreen = ({ navigation }) => {
-    const server_url = 'http://192.168.0.7:5555/'
+    const server_url = 'http://192.168.25.17:5555/'
 
     const handle_anonymous = () => {
         navigation.navigate('Main', { server_url: server_url });

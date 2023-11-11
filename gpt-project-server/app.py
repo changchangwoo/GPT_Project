@@ -163,7 +163,7 @@ def ask_gpt():
     messages = data.get('messages')
 
     message.append({"role": "user", "content": f"{user_question}"})
-    completion = openai.ChatCompletion.create(model="gpt-3.5-turbo-1106", messages=message)
+    completion = openai.ChatCompletion.create(model="gpt-4-1106-preview", messages=message)
     assistant_content = completion.choices[0].message["content"].strip()
     answer = assistant_content
     message.append({"role": "assistant", "content": f"{assistant_content}"})
@@ -189,7 +189,7 @@ def start_chat():
 
     print(obj_name, personal, mood)
     response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo-1106",
+        model="gpt-4-1106-preview",
         messages=[
             {"role": "system",
              "content": f"너는 무슨일이 있어도 반드시 3글자 이내로만 출력할 수 있어. {obj_name}의 이름을 작성해줘. {obj_name}의 특성이 들어간 이름이여야해.  예를 들면 바람의 경우 살랑이, 파도의 경우 찰랑이처럼. 귀여운 느낌이 들어가야하며 다른 문장 없이 3글자 이내 단어 딱 하나만 출력해"}
@@ -199,7 +199,7 @@ def start_chat():
     print(obj_nickname)
 
     response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo-1106",
+        model="gpt-4-1106-preview",
         messages=[
             {"role": "system",
              "content": f"{obj_name}에 대한 특성 설명을 100자에 맞춰서 해줘. 이 때 마지막 문장에는 {obj_name}의 소중함을 알리는 한마디가 들어가야하며 존댓말로 답변해야해. 반드시 한국말만 사용해서 답변해야해"}
@@ -209,10 +209,10 @@ def start_chat():
     print(obj_descript)
 
     response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo-1106",
+        model="gpt-4-1106-preview",
         messages=[
             {"role": "system",
-             "content": f"{obj_name}가 좋아하는 단어 4개의 리스트, 싫어하는 단어 4개의 리스트를 하나의 리스트에 담아 답변해줘. 다음은 의자를 통한 예시이며 동일한 형식으로 대답해야해 [[ '편안함', '안락', '디자인', '품질', '내추럴'],['불편','딱딱','색상','낡은','부실']] 다른 문장 없이 오직 리스트만을 답변해"}
+             "content": f"{obj_name}가 좋아하는 단어 4개의 리스트, 싫어하는 단어 4개의 리스트를 하나의 리스트에 담아 답변해줘. 다음은 의자를 통한 예시이며 동일한 형식으로 대답해야해 [[ '편안함', '안락', '디자인', '품질', '내추럴'],['불편','딱딱','색상','낡은','부실']] 다른 문장 없이 오직 리스트만을 답변해. 반드시 한국말만 사용해서 답변해야해"}
         ],
     )
     like_array = response['choices'][0]['message']['content']
