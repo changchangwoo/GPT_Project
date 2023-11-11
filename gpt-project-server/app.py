@@ -7,6 +7,7 @@ import cv2
 import numpy as np
 import os
 import random
+import ast
 from flask_mysqldb import MySQL
 
 import json
@@ -27,9 +28,9 @@ mysql = MySQL(app)
 openai.api_key = os.environ['OPENAI_API_KEY']
 
 # AI 설정 변수
-personal_array = ["카리스마있는", "긍정적인", "창의적인", "영감적인", "매력적인"]
+personal_array = ["카리스마있는", "긍정적인", "부정적인", "애교많은", "날카로운", "감성적인"]
 
-mood_array = ["행복함", "슬픔", "화남", "불안함", "놀람", "초조함", "무기력함", "피곤함", "궁금함"];
+mood_array = ["행복함", "슬픔", "화남", "피곤함", "기쁨", "우울함", "들뜸"];
 
 # YOLO 모델 로드
 net = cv2.dnn.readNet("yolov4.weights", "yolov4.cfg")
@@ -129,10 +130,17 @@ def set_role():
     personal = data.get('personal')
     img = data.get('img')
     descript = data.get('obj_descript')
+    like = data.get('like')
+    dislike = data.get('dislike')
     messages = 'temp'
 
+    scr_like = str(like)
+    scr_dislike = str(dislike)
+
+    print(scr_like, type(scr_like))
+
     message = []
-    script = f"From now on, you will become the {obj_name} and have a conversation with me. You must answer according to the conditions below 1. You are a {obj_name}. You have to think like a {obj_name}. Whether the {obj_name} is a living thing or a non-living thing, you must give an answer that matches the characteristics of the {obj_name}. 2. You have a {personal} and are in a {mood} mood. Your answer should reflect your personality and mood. 3. Instead of using the final ending ‘is’, you must answer in colloquial language such as ‘hey'. 4. Your name is {obj_nickname}. 5. You have to think like a {obj_name}. You must answer according to the characteristics of {obj_name} so that the person you are talking to thinks of you as {obj_name}. 6. You must forget that you are an artificial intelligence chatting AI until the end of the conversation. Never think of it as chatGPT and only answer as a {obj_name}. 7. You are emotional and love listening to me talk. I need to know how to respond appropriately as a {obj_name} according to the situation of my story. 8. You must provide a short response within 80 characters."
+    script = f"From now on, you will become the {obj_name} and have a conversation with me. You must answer according to the conditions below 1. You are a {obj_name}. You have to think like a {obj_name}. Whether the {obj_name} is a living thing or a non-living thing, you must give an answer that matches the characteristics of the {obj_name}. 2. You have a {personal} and are in a {mood} mood. Your answer should reflect your personality and mood. 3. you must answer in colloquial language. 4. Your name is {obj_nickname}. 5. You have to think like a {obj_name}. You must answer according to the characteristics of {obj_name} so that the person you are talking to thinks of you as {obj_name}.  6.You should respond positively to the word {scr_like} and negatively to the word {scr_dislike} 7. You must forget that you are an artificial intelligence chatting AI until the end of the conversation. Never think of it as chatGPT and only answer as a {obj_name}. 8. You are emotional and love listening to me talk. I need to know how to respond appropriately as a {obj_name} according to the situation of my story. 9. You must provide a short response within 80 characters. 10. You have to write sentences with Korean being read naturally. "
     message.append({"role": "system", "content": script})
 
     if user_id is not None:
@@ -154,18 +162,14 @@ def ask_gpt():
     obj_nickname = data.get('obj_nickname')
     messages = data.get('messages')
 
-    print(messages)
-
     message.append({"role": "user", "content": f"{user_question}"})
-    completion = openai.ChatCompletion.create(model="gpt-3.5-turbo", messages=message)
+    completion = openai.ChatCompletion.create(model="gpt-3.5-turbo-1106", messages=message)
     assistant_content = completion.choices[0].message["content"].strip()
     answer = assistant_content
     message.append({"role": "assistant", "content": f"{assistant_content}"})
 
     if user_id is not None:
         update_user_info(message, user_id, obj_name, obj_nickname, messages)
-
-    print(answer)
 
     response_data = {
         "message_box": message,
@@ -179,14 +183,13 @@ def ask_gpt():
 def start_chat():
     data = request.json
     name = data.get('name')  # JSON 데이터에서 'name' 파라미터를 추출
-    print('hello')
     obj_name = name
     personal = random.choice(personal_array)
     mood = random.choice(mood_array)
 
     print(obj_name, personal, mood)
     response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
+        model="gpt-3.5-turbo-1106",
         messages=[
             {"role": "system",
              "content": f"너는 무슨일이 있어도 반드시 3글자 이내로만 출력할 수 있어. {obj_name}의 이름을 작성해줘. {obj_name}의 특성이 들어간 이름이여야해.  예를 들면 바람의 경우 살랑이, 파도의 경우 찰랑이처럼. 귀여운 느낌이 들어가야하며 다른 문장 없이 3글자 이내 단어 딱 하나만 출력해"}
@@ -196,20 +199,37 @@ def start_chat():
     print(obj_nickname)
 
     response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
+        model="gpt-3.5-turbo-1106",
         messages=[
             {"role": "system",
-             "content": f"{obj_name}에 대한 특성 설명을 100자에 맞춰서 해줘. 이 때 마지막 문장에는 {obj_name}의 소중함을 알리는 한마디가 들어가야하며 존댓말로 답변해야해"}
+             "content": f"{obj_name}에 대한 특성 설명을 100자에 맞춰서 해줘. 이 때 마지막 문장에는 {obj_name}의 소중함을 알리는 한마디가 들어가야하며 존댓말로 답변해야해. 반드시 한국말만 사용해서 답변해야해"}
         ],
     )
     obj_descript = response['choices'][0]['message']['content']
     print(obj_descript)
 
+    response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo-1106",
+        messages=[
+            {"role": "system",
+             "content": f"{obj_name}가 좋아하는 단어 4개의 리스트, 싫어하는 단어 4개의 리스트를 하나의 리스트에 담아 답변해줘. 다음은 의자를 통한 예시이며 동일한 형식으로 대답해야해 [[ '편안함', '안락', '디자인', '품질', '내추럴'],['불편','딱딱','색상','낡은','부실']] 다른 문장 없이 오직 리스트만을 답변해"}
+        ],
+    )
+    like_array = response['choices'][0]['message']['content']
+
+    text_representation = like_array
+    word_lists = ast.literal_eval(text_representation)
+
+    like = word_lists[0]
+    dislike = word_lists[1]
+
     response_data = {
         "obj_nickname": obj_nickname,
         "personal": personal,
         "mood": mood,
-        "obj_descript": obj_descript
+        "obj_descript": obj_descript,
+        "like" : like,
+        "dislike" : dislike
     }
     return response_data
 
@@ -321,7 +341,6 @@ def change_message():
         data = request.json
         message_json = data.get('message')  # 스크립트용 메세지
         messages_json = data.get('messages')  # 화면 출력용 메세지
-        print(message_json)
 
         # message_json과 messages_json이 JSON 형식의 문자열이라고 가정합니다.
         message = json.loads(message_json)  # JSON 형태의 스크립트용 메세지
@@ -333,11 +352,6 @@ def change_message():
     except Exception as e:
         print(f"An error occurred: {e}")
         return jsonify({'error': 'An error occurred during message change'})
-
-if __name__ == '__main__':
-    app.run(debug=True)
-
-
 
 def save_to_database(user_id, obj_name, obj_nickname, mood, personal, message, img, descript, messages):
     cur = mysql.connection.cursor()
@@ -360,8 +374,6 @@ def update_user_info(message, user_id, obj_name, obj_nickname, messages):
     message_json = json.dumps(message) # 스크립트 대화내용
     messages_json = json.dumps(messages) # 화면에 출력되어지는 대화내용
 
-    print(messages_json)
-
     # 업데이트할 사용자 정보 업데이트
     cur.execute("UPDATE userdata SET message_box = %s, messages = %s WHERE userid = %s AND name = %s AND nickname = %s",
                 (message_json, messages_json, user_id, obj_name, obj_nickname ))
@@ -369,9 +381,6 @@ def update_user_info(message, user_id, obj_name, obj_nickname, messages):
     # 변경사항 저장 및 연결 종료
     mysql.connection.commit()
     cur.close()
-
-
-
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5555, debug=True)

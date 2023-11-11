@@ -4,7 +4,7 @@ import { intro_style, style } from '../styles/CSS';
 
 
 const IntroScreen = ({ navigation }) => {
-    const server_url = 'http://192.168.25.17:5555/'
+    const server_url = 'http://192.168.0.7:5555/'
 
     const handle_anonymous = () => {
         navigation.navigate('Main', { server_url: server_url });
@@ -24,11 +24,11 @@ const IntroScreen = ({ navigation }) => {
             </View>
             <View style={intro_style.middle_container}>
                 <Text style={intro_style.logo}>
-                    귀를 기울이면
+                    작은 친구들
                 </Text>
                 <Text style={intro_style.logo_descript}>
                     그동안 내가 놓치고 있었던{'\n'}
-                    주변 목소리에 귀를 기울여보세요
+                    작은 목소리에 귀를 기울여보세요
                 </Text>
             </View>
             <View style={intro_style.low_container}>

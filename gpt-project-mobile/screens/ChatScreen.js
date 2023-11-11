@@ -19,6 +19,8 @@ function ChatScreen({ navigation, route }) {
     useEffect(() => {
         const server_url = route.params.server_url
         const obj_name = route.params.obj_name
+        const like = route.params.like
+        const dislike = route.params.dislike
         const obj_nickname = route.params.obj_nickname
         const mood = route.params.mood
         const personal = route.params.personal
@@ -54,7 +56,9 @@ function ChatScreen({ navigation, route }) {
                     mood: mood,
                     personal: personal,
                     obj_descript: obj_descript,
-                    img: img
+                    img: img,
+                    like: like,
+                    dislike: dislike
                 });
 
                 if (response.status === 200) {

@@ -174,28 +174,22 @@ export const profile_style = StyleSheet.create({
     },
     top_container: {
         width: '100%',
-        height: '45%',
+        height: '60%',
         alignItems: 'center',
     },
     circleView: {
-        width: 150,
-        height: 150,
+        width: 100,
+        height: 100,
         borderRadius: 100,
         backgroundColor: '#F5ECF9',
         alignItems: 'center',
         justifyContent: 'center',
         marginTop: 40
     },
-
-    circleText: {
-        fontSize: 20,
-        color: 'white',
-    },
-
     logo: {
         fontSize: style.font_size_large,
         fontFamily: 'NEXON_MEDIUM',
-        marginTop: 50
+        marginTop: 20
     },
     logo_descript: {
         fontSize: style.font_size_medium,
@@ -206,20 +200,59 @@ export const profile_style = StyleSheet.create({
 
     middle_container: {
         width: '100%',
-        height: '10%',
         flexDirection: 'row',
         justifyContent: 'center',
-        alignItems: 'center'
+        alignItems: 'center',
+        marginTop: 20,
+        marginBottom: 10
     },
     personal_box: {
         width: '30%',
         height: 30,
         backgroundColor: '#F5ECF9',
-        marginHorizontal: 20,
-        marginTop: 30,
+        marginHorizontal: 10,
         borderRadius: 10,
+        borderWidth: 1,
+        borderColor: '#CCCCCC',
         justifyContent: 'center',
+    },
+    like_box : {
+        width: '100%',
+        height: '10%',
+        marginTop: 10,
+        paddingLeft: 20,
+        paddingRight: 20,
+        flexDirection: 'row'
+    },
+    like_left : {
+        width: '15%',
+        height: '100%',
+        alignItems: 'center',
+        justifyContent: 'center'
+    },
+    like_text : {
+        fontSize: style.font_size_small,
+        fontFamily: 'NEXON_LIGHT',
+    },
+    like_right : {
+        width: '85%',
+        height: '100%',
+        flexDirection: 'row'
 
+    },
+    like : {
+        width: '20%',
+        backgroundColor: 'white',
+        marginLeft: 10,
+        borderRadius: 10,
+        borderWidth: 1,
+        borderColor: '#CCCCCC',
+        alignItems: 'center',
+        justifyContent: 'center'
+    },
+    like_descript : {
+        fontFamily: 'NEXON_LIGHT',
+        fontSize: style.font_size_small-4
     },
     personal_text: {
         fontFamily: 'NEXON_LIGHT',
@@ -229,10 +262,12 @@ export const profile_style = StyleSheet.create({
     },
     low_container: {
         width: '100%',
-        height: '50%',
+        height: '40%',
         borderTopLeftRadius: 30,
         borderTopRightRadius: 30,
-        backgroundColor: '#B8A8C4',
+        backgroundColor: 'white',
+        borderWidth: 1,
+        borderColor: '#CCCCCC',
         marginTop: 20,
         padding: 20
     },
@@ -242,8 +277,8 @@ export const profile_style = StyleSheet.create({
         marginTop: 10
     },
     text_descript: {
-        color: 'white',
-        fontFamily: 'NEXON_MEDIUM',
+        color: 'black',
+        fontFamily: 'NEXON_LIGHT',
         fontSize: style.font_size_small,
         textAlign: 'center'
     },
@@ -466,7 +501,7 @@ export const list_style = StyleSheet.create({
     },
     list_container: {
         width: '100%',
-        height: '12%',
+        height: 80,
         borderBottomWidth: 1,
         borderBottomColor: '#cccccc',
     },
@@ -475,19 +510,24 @@ export const list_style = StyleSheet.create({
         height: '100%',
         flexDirection: 'row'
     },
-
+    scroll_container : {
+        width: '100%',
+        height: '100%',
+        borderBottomWidth: 1,
+        borderBottomColor: '#cccccc',
+    },
     opacityReducedContainer: {
         opacity: 0.3, // 원하는 값을 사용하세요.
 
     },
-    delete_container: {
-        width: '100%',
-        height: '100%',
+    button_container : {
         justifyContent: 'center',
-        zIndex: 1,
-        backgroundColor: 'orange'
+        alignItems: 'center',
+        width: '100%',
+        height: '30%',
 
     },
+    
     delete_button: {
         height: '100%',
         backgroundColor: 'yellow',

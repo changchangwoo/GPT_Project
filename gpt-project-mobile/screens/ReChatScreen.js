@@ -33,7 +33,8 @@ function ReChatScreen({ navigation, route }) {
             .post(server_url + 'change_message', { message: message, messages: messages })
             .then((response) => {
                 console.log(response.data.messages)
-                setMessages(response.data.messages)
+                setMessage_box(response.data.message) // 스크립트 메세지
+                setMessages(response.data.messages) // 화면에 출력되는 메세지
 
             })
             .catch((error) => {
@@ -68,7 +69,8 @@ function ReChatScreen({ navigation, route }) {
                         obj_name: obj_name,
                         obj_nickname: obj_nickname,
                         text: inputText,
-                        message_box: message_box
+                        message_box: message_box,
+                        messages: messages
                     });
                 const botReply = response.data.answer;
                 setMessage_box(response.data.message_box)

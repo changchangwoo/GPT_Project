@@ -14,6 +14,8 @@ const ProfileScreen = ({ navigation, route }) => {
     const [obj_descript, setObj_descirpt] = useState('');
     const [obj_nickname, setObj_nickname] = useState('');
     const [personal, setPersonal] = useState('');
+    const [like, setLike] = useState([]);
+    const [dislike, setDislike] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
 
 
@@ -49,6 +51,8 @@ const ProfileScreen = ({ navigation, route }) => {
                     setObj_descirpt(response.data.obj_descript);
                     setMood(response.data.mood);
                     setPersonal(response.data.personal);
+                    setLike(response.data.like)
+                    setDislike(response.data.dislike)
                     setIsLoading(false); // 데이터 로딩이 완료되면 isLoading을 false로 설정
                 } else {
                     console.log('error');
@@ -63,7 +67,7 @@ const ProfileScreen = ({ navigation, route }) => {
     }, [navigation]);
 
     const NavChatScreen = () => {
-        navigation.navigate('Chat', { img: img, obj_name: obj_name, mood: mood, obj_nickname: obj_nickname, personal: personal, server_url: server_url, user_id: user_id, obj_descript: obj_descript })
+        navigation.navigate('Chat', { img: img, obj_name: obj_name, mood: mood, obj_nickname: obj_nickname, personal: personal, server_url: server_url, user_id: user_id, obj_descript: obj_descript, like: like, dislike: dislike })
     };
 
     if (isLoading) {
@@ -103,17 +107,49 @@ const ProfileScreen = ({ navigation, route }) => {
                         {obj_name}
                     </Text>
                 </View>
-            </View>
-            <View style={profile_style.middle_container}>
-                <View style={profile_style.personal_box}>
-                    <Text style={profile_style.personal_text}>
-                        {personal}
-                    </Text>
+                <View style={profile_style.middle_container}>
+                    <View style={profile_style.personal_box}>
+                        <Text style={profile_style.personal_text}>
+                            {personal}
+                        </Text>
+                    </View>
+                    <View style={profile_style.personal_box}>
+                        <Text style={profile_style.personal_text}>
+                            {mood}
+                        </Text>
+                    </View>
                 </View>
-                <View style={profile_style.personal_box}>
-                    <Text style={profile_style.personal_text}>
-                        {mood}
-                    </Text>
+                <View style={profile_style.like_box}>
+                    <View style={profile_style.like_left}>
+                        <Text style={profile_style.like_text}>
+                            좋아
+                        </Text>
+                    </View>
+                    <View style={profile_style.like_right}>
+                        {like.map((item, index) => (
+                            <View key={index} style={profile_style.like}>
+                                <Text style={profile_style.like_descript}>
+                                    {item}
+                                </Text>
+                            </View>
+                        ))}
+                    </View>
+                </View>
+                <View style={profile_style.like_box}>
+                    <View style={profile_style.like_left}>
+                        <Text style={profile_style.like_text}>
+                            싫어
+                        </Text>
+                    </View>
+                    <View style={profile_style.like_right}>
+                        {dislike.map((item, index) => (
+                            <View key={index} style={profile_style.like}>
+                                <Text style={profile_style.like_descript}>
+                                    {item}
+                                </Text>
+                            </View>
+                        ))}
+                    </View>
                 </View>
             </View>
             <View style={profile_style.low_container}>
