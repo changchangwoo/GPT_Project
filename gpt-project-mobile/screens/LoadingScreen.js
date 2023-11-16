@@ -15,7 +15,7 @@ const splashStyle = StyleSheet.create({
         flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#FBE3F0',
+        backgroundColor: '#7E506C',
     }
 });
 

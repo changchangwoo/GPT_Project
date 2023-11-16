@@ -34,7 +34,13 @@ const MainScreen = ({ navigation, route }) => {
             return;
         }
 
-        const result = await ImagePicker.launchCameraAsync();
+        const result = await ImagePicker.launchCameraAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsEditing: true,
+            aspect: [4, 3],
+            quality: 1,
+            cameraType: ImagePicker.CameraType.back, // 후면 카메라 설정
+        });
 
         if (result.canceled === false) {
             setSelectedImage(result.assets[0].uri);
