@@ -75,7 +75,7 @@ export const intro_style = StyleSheet.create({
         width: '100%',
         height: '100%',
         marginTop: 100,
-        resizeMode: 'contain', // 이미지 비율 유지
+        resizeMode: 'contain',
     }
 });
 
@@ -107,17 +107,17 @@ export const main_style = StyleSheet.create({
         height: '30%',
         borderRadius: 10,
         backgroundColor: '#F5ECF9',
-        elevation: 5, // Android에서 그림자를 추가할 때 사용
-        shadowColor: 'black', // iOS에서 그림자 색상
-        shadowOffset: { width: 0, height: 2 }, // 그림자의 위치 (가로, 세로)
-        shadowOpacity: 0.2, // 그림자의 투명도
-        shadowRadius: 4, // 그림자의 반
+        elevation: 5,
+        shadowColor: 'black',
+        shadowOffset: { width: 0, height: 2 }, 
+        shadowOpacity: 0.2, 
+        shadowRadius: 4, 
 
     },
     main_image: {
         width: '100%',
         height: '100%',
-        resizeMode: 'contain', // 이미지 비율 유지
+        resizeMode: 'contain',
     },
     low_container: {
         width: '100%',
@@ -299,7 +299,7 @@ export const profile_style = StyleSheet.create({
     loading_image: {
         width: 300,
         height: 300,
-        resizeMode: 'contain', // 이미지 비율 유지
+        resizeMode: 'contain',
     },
     loading_container: {
         flex: 1,
@@ -422,11 +422,11 @@ export const login_style = StyleSheet.create({
         height: '40%',
         borderRadius: 20,
         backgroundColor: '#F5ECF9',
-        elevation: 5, // Android에서 그림자를 추가할 때 사용
-        shadowColor: 'black', // iOS에서 그림자 색상
-        shadowOffset: { width: 0, height: 2 }, // 그림자의 위치 (가로, 세로)
-        shadowOpacity: 0.2, // 그림자의 투명도
-        shadowRadius: 4, // 그림자의 반
+        elevation: 5,
+        shadowColor: 'black', 
+        shadowOffset: { width: 0, height: 2 }, 
+        shadowOpacity: 0.2, 
+        shadowRadius: 4,
         padding: 20
     },
     text_input: {
@@ -517,7 +517,7 @@ export const list_style = StyleSheet.create({
         borderBottomColor: '#cccccc',
     },
     opacityReducedContainer: {
-        opacity: 0.3, // 원하는 값을 사용하세요.
+        opacity: 0.3,
 
     },
     button_container : {
