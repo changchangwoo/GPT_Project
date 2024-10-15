@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, Image, Alert } from 'react-native';
 import { profile_style } from '../styles/CSS';
-import * as ImagePicker from 'expo-image-picker';
 import axios from 'axios';
 
 
 const ProfileScreen = ({ navigation, route }) => {
-    const server_url = route.params.server_url
+    const server_url = process.env.EXPO_PUBLIC_API_URL;
     const user_id = route.params.user_id
     const [img, setImage] = useState(null);
     const [obj_name, setObj_name] = useState('');
@@ -36,7 +35,6 @@ const ProfileScreen = ({ navigation, route }) => {
             headerTitleAlign: 'center',
         });
 
-        // 데이터 로딩
         const setProfile = async () => {
             const name = route.params.obj_name;
             console.log(name);
@@ -53,14 +51,14 @@ const ProfileScreen = ({ navigation, route }) => {
                     setPersonal(response.data.personal);
                     setLike(response.data.like)
                     setDislike(response.data.dislike)
-                    setIsLoading(false); // 데이터 로딩이 완료되면 isLoading을 false로 설정
+                    setIsLoading(false);
                 } else {
                     console.log('error');
-                    setIsLoading(false); // 에러가 발생하더라도 isLoading을 false로 설정
+                    setIsLoading(false);
                 }
             } catch (error) {
                 console.log(error);
-                setIsLoading(false); // 에러가 발생하더라도 isLoading을 false로 설정
+                setIsLoading(false);
             }
         };
         setProfile();
@@ -74,7 +72,7 @@ const ProfileScreen = ({ navigation, route }) => {
         return (
             <View style={profile_style.loading_container}>
                 <Image
-                    source={require('../assets/imgs/loading_image.png')} // 이미지 경로 설정
+                    source={require('../assets/imgs/loading_image.png')}
                     style={profile_style.loading_image}
                 />
                 <Text style={profile_style.loading_text}>새 친구가 대화를 준비하는 중입니다 {'\n'}

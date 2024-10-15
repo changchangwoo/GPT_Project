@@ -4,7 +4,7 @@ const LoadingScreen = ({ }) => {
 
     return (
         <View style={splashStyle.loadingContainer}>
-            <Text>기달</Text>
+            <Text>로딩중입니다</Text>
         </View>
     );
 };

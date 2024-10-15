@@ -1,16 +1,14 @@
-import React from 'react';
-import { View, Text, Button, TouchableOpacity, Image } from 'react-native';
-import { intro_style, style } from '../styles/CSS';
+import { View, Text, TouchableOpacity, Image } from 'react-native';
+import { intro_style } from '../styles/CSS';
 
 
 const IntroScreen = ({ navigation }) => {
-    const server_url = 'http://172.29.50.110:5555/'
 
     const handle_anonymous = () => {
-        navigation.navigate('Main', { server_url: server_url });
+        navigation.navigate('Main');
     }
     const handle_login = () => {
-        navigation.navigate('Login', { server_url: server_url });
+        navigation.navigate('Login');
     }
 
 
@@ -18,7 +16,7 @@ const IntroScreen = ({ navigation }) => {
         <View style={intro_style.container}>
             <View style={intro_style.top_container}>
                 <Image
-                    source={require('../assets/imgs/intro_image.png')} // 이미지 경로 설정
+                    source={require('../assets/imgs/intro_image.png')}
                     style={intro_style.intro_image}
                 />
             </View>

@@ -6,33 +6,22 @@ import { chat_style } from '../styles/CSS';
 function ChatScreen({ navigation, route }) {
     const [messages, setMessages] = useState([]);
     const [inputText, setInputText] = useState('');
-    const [message_box, setMessage_box] = useState([]);
+    const scrollViewRef = useRef();
+    const server_url = process.env.EXPO_PUBLIC_API_URL;
 
-    const [obj_descript, setObj_descirpt] = useState('');
-    const [user_id, setUser_id] = useState('');
-    const [obj_name, setObj_name] = useState('');
-    const [obj_nickname, setObj_nickname] = useState('');
-
-    const server_url = route.params.server_url;
-    const scrollViewRef = useRef(); // Ref for the ScrollView
+    const {
+        obj_name,
+        obj_nickname,
+        mood,
+        personal,
+        user_id,
+        img,
+        obj_descript,
+        like,
+        dislike,
+    } = route.params;
 
     useEffect(() => {
-        const server_url = route.params.server_url
-        const obj_name = route.params.obj_name
-        const like = route.params.like
-        const dislike = route.params.dislike
-        const obj_nickname = route.params.obj_nickname
-        const mood = route.params.mood
-        const personal = route.params.personal
-        const user_id = route.params.user_id
-        const img = route.params.img
-        const obj_descript = route.params.obj_descript
-
-        setUser_id(user_id)
-        setObj_name(obj_name)
-        setObj_nickname(obj_nickname)
-        setObj_descirpt(obj_descript)
-
         navigation.setOptions({
             title: '채팅화면',
             headerTitleStyle: {
@@ -41,58 +30,55 @@ function ChatScreen({ navigation, route }) {
             },
             headerStyle: {
                 backgroundColor: 'white',
-                borderBottomWidth: 1, // 네비게이션 바 하단에 선을 추가
-                borderBottomColor: '#d3d3d3', // 선의 색상
+                borderBottomWidth: 1,
+                borderBottomColor: '#d3d3d3',
             },
             headerTitleAlign: 'center',
         });
 
         const setRole = async () => {
             try {
-                const response = await axios.post(server_url + 'set_role', {
-                    user_id: user_id, // obj_id를 데이터에 추가
-                    obj_name: obj_name,
-                    obj_nickname: obj_nickname,
-                    mood: mood,
-                    personal: personal,
-                    obj_descript: obj_descript,
-                    img: img,
-                    like: like,
-                    dislike: dislike
+                const response = await axios.post(`${server_url}set_role`, {
+                    user_id,
+                    obj_name,
+                    obj_nickname,
+                    mood,
+                    personal,
+                    obj_descript,
+                    img,
+                    like,
+                    dislike,
                 });
 
                 if (response.status === 200) {
-                    setMessage_box(response.data.message);
+                    setMessages(response.data.message);
                 } else {
-                    console.log('error');
+                    console.error('Failed to set role');
                 }
             } catch (error) {
-                console.log(error);
+                console.error('Error setting role:', error);
             }
-        }
+        };
         setRole();
-    }, [navigation]);
+    }, [navigation, server_url, obj_name, obj_nickname, mood, personal, user_id, img, obj_descript, like, dislike]);
 
     const sendMessage = async () => {
         if (inputText) {
-            scrollViewRef.current.scrollToEnd({ animated: true });
             addMessage(inputText, true);
             setInputText('');
-            try {
-                const response = await axios.post(server_url + 'ask',
-                    {
-                        user_id: user_id,
-                        obj_name: obj_name,
-                        obj_nickname: obj_nickname,
-                        text: inputText,
-                        message_box: message_box,
-                        messages: messages
-                    });
-                const botReply = response.data.answer;
-                setMessage_box(response.data.message_box)
-                addMessage(botReply, false);
-                scrollViewRef.current.scrollToEnd({ animated: true });
 
+            try {
+                const response = await axios.post(`${server_url}ask`, {
+                    user_id,
+                    obj_name,
+                    obj_nickname,
+                    text: inputText,
+                    messages,
+                });
+
+                const botReply = response.data.answer;
+                setMessages(prev => [...prev, { text: botReply, isUser: false }]);
+                scrollToBottom();
             } catch (error) {
                 console.error('Error sending message:', error);
             }
@@ -100,10 +86,12 @@ function ChatScreen({ navigation, route }) {
     };
 
     const addMessage = (text, isUser) => {
-        setMessages((prevMessages) => [
-            ...prevMessages,
-            { text, isUser },
-        ]);
+        setMessages(prevMessages => [...prevMessages, { text, isUser }]);
+        scrollToBottom();
+    };
+
+    const scrollToBottom = () => {
+        scrollViewRef.current.scrollToEnd({ animated: true });
     };
 
     return (
@@ -114,30 +102,31 @@ function ChatScreen({ navigation, route }) {
             <ScrollView
                 style={chat_style.chat_container}
                 ref={scrollViewRef}
+                contentContainerStyle={{ paddingBottom: 20 }} // 아래쪽 여백 추가
             >
-                {messages.map((message, index) => (
-                    <View key={index} style={message.isUser ? chat_style.user_message : chat_style.bot_message}>
-                        <Text style={message.isUser ? chat_style.user_conversation : chat_style.bot_conversation}>{message.text}</Text>
-                    </View>
-                ))}
+                {messages.length > 0 ? (
+                    messages.map((message, index) => (
+                        <View key={index} style={message.isUser ? chat_style.user_message : chat_style.bot_message}>
+                            <Text style={message.isUser ? chat_style.user_conversation : chat_style.bot_conversation}>{message.text}</Text>
+                        </View>
+                    ))
+                ) : (
+                    <Text style={{ textAlign: 'center', marginTop: 20 }}>메시지가 없습니다.</Text>
+                )}
             </ScrollView>
             <View style={chat_style.input_container}>
                 <TextInput
                     style={chat_style.input}
                     placeholder="메세지를 입력하세요"
                     value={inputText}
-                    onChangeText={(text) => setInputText(text)}
+                    onChangeText={setInputText}
                 />
-                <TouchableOpacity style={chat_style.send_btn}
-                    onPress={sendMessage}>
-                    <Image
-                        source={require('../assets/icons/send.png')}
-                        style={chat_style.icon_send}
-                    />
+                <TouchableOpacity style={chat_style.send_btn} onPress={sendMessage}>
+                    <Image source={require('../assets/icons/send.png')} style={chat_style.icon_send} />
                 </TouchableOpacity>
-
             </View>
         </KeyboardAvoidingView>
     );
 }
+
 export default ChatScreen;

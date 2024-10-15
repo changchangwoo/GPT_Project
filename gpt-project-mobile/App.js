@@ -25,7 +25,6 @@ export default function App() {
           <Stack.Screen name="Login" component={LoginScreen} />
           <Stack.Screen name="List" component={ListScreen} />
           <Stack.Screen name="ReChat" component={ReChatScreen} />
-
         </Stack.Navigator>
       </FontLoader>
     </NavigationContainer>

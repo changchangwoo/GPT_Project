@@ -6,41 +6,14 @@ import { chat_style } from '../styles/CSS';
 function ReChatScreen({ navigation, route }) {
     const [messages, setMessages] = useState([]);
     const [inputText, setInputText] = useState('');
-    const [message_box, setMessage_box] = useState([]);
+    const server_url = process.env.EXPO_PUBLIC_API_URL;
 
-    const [obj_descript, setObj_descirpt] = useState('');
-    const [user_id, setUser_id] = useState('');
-    const [obj_name, setObj_name] = useState('');
-    const [obj_nickname, setObj_nickname] = useState('');
+    const scrollViewRef = useRef();
 
-    const server_url = route.params.server_url;
-    const scrollViewRef = useRef(); // Ref for the ScrollView
+    const { item } = route.params;
+    const { name: obj_name, nickname: obj_nickname, userid: user_id, message_box, messages: initialMessages } = item;
 
     useEffect(() => {
-        const server_url = route.params.server_url
-        const data = route.params.item
-        const obj_name = data.name
-        const obj_nickname = data.nickname
-        const user_id = data.userid
-        const message = data.message_box
-        const messages = data.messages
-
-        setUser_id(user_id)
-        setObj_name(obj_name)
-        setObj_nickname(obj_nickname)
-
-        axios
-            .post(server_url + 'change_message', { message: message, messages: messages })
-            .then((response) => {
-                console.log(response.data.messages)
-                setMessage_box(response.data.message) // 스크립트 메세지
-                setMessages(response.data.messages) // 화면에 출력되는 메세지
-
-            })
-            .catch((error) => {
-                console.error(error);
-            });
-
         navigation.setOptions({
             title: '채팅화면',
             headerTitleStyle: {
@@ -49,34 +22,41 @@ function ReChatScreen({ navigation, route }) {
             },
             headerStyle: {
                 backgroundColor: 'white',
-                borderBottomWidth: 1, // 네비게이션 바 하단에 선을 추가
-                borderBottomColor: '#d3d3d3', // 선의 색상
+                borderBottomWidth: 1,
+                borderBottomColor: '#d3d3d3',
             },
             headerTitleAlign: 'center',
         });
 
-    }, [navigation]);
+        const fetchMessages = async () => {
+            try {
+                const response = await axios.post(`${server_url}change_message`, { message: message_box, messages: initialMessages });
+                setMessages(response.data.messages);
+            } catch (error) {
+                console.error(error);
+            }
+        };
+        fetchMessages();
+    }, [navigation, server_url, message_box, initialMessages]);
 
     const sendMessage = async () => {
         if (inputText) {
             scrollViewRef.current.scrollToEnd({ animated: true });
             addMessage(inputText, true);
             setInputText('');
-            try {
-                const response = await axios.post(server_url + 'ask',
-                    {
-                        user_id: user_id,
-                        obj_name: obj_name,
-                        obj_nickname: obj_nickname,
-                        text: inputText,
-                        message_box: message_box,
-                        messages: messages
-                    });
-                const botReply = response.data.answer;
-                setMessage_box(response.data.message_box)
-                addMessage(botReply, false);
-                scrollViewRef.current.scrollToEnd({ animated: true });
 
+            try {
+                const response = await axios.post(`${server_url}ask`, {
+                    user_id,
+                    obj_name,
+                    obj_nickname,
+                    text: inputText,
+                    message_box,
+                    messages,
+                });
+
+                addMessage(response.data.answer, false);
+                scrollViewRef.current.scrollToEnd({ animated: true });
             } catch (error) {
                 console.error('Error sending message:', error);
             }
@@ -84,24 +64,17 @@ function ReChatScreen({ navigation, route }) {
     };
 
     const addMessage = (text, isUser) => {
-        setMessages((prevMessages) => [
-            ...prevMessages,
-            { text, isUser },
-        ]);
+        setMessages(prevMessages => [...prevMessages, { text, isUser }]);
     };
 
     return (
-        <KeyboardAvoidingView
-            style={chat_style.container}
-            behavior={Platform.OS === 'ios' ? 'padding' : null}
-        >
-            <ScrollView
-                style={chat_style.chat_container}
-                ref={scrollViewRef}
-            >
+        <KeyboardAvoidingView style={chat_style.container} behavior={Platform.OS === 'ios' ? 'padding' : null}>
+            <ScrollView style={chat_style.chat_container} ref={scrollViewRef}>
                 {messages.map((message, index) => (
                     <View key={index} style={message.isUser ? chat_style.user_message : chat_style.bot_message}>
-                        <Text style={message.isUser ? chat_style.user_conversation : chat_style.bot_conversation}>{message.text}</Text>
+                        <Text style={message.isUser ? chat_style.user_conversation : chat_style.bot_conversation}>
+                            {message.text}
+                        </Text>
                     </View>
                 ))}
             </ScrollView>
@@ -110,18 +83,14 @@ function ReChatScreen({ navigation, route }) {
                     style={chat_style.input}
                     placeholder="메세지를 입력하세요"
                     value={inputText}
-                    onChangeText={(text) => setInputText(text)}
+                    onChangeText={setInputText}
                 />
-                <TouchableOpacity style={chat_style.send_btn}
-                    onPress={sendMessage}>
-                    <Image
-                        source={require('../assets/icons/send.png')}
-                        style={chat_style.icon_send}
-                    />
+                <TouchableOpacity style={chat_style.send_btn} onPress={sendMessage}>
+                    <Image source={require('../assets/icons/send.png')} style={chat_style.icon_send} />
                 </TouchableOpacity>
-
             </View>
         </KeyboardAvoidingView>
     );
 }
+
 export default ReChatScreen;

@@ -5,17 +5,15 @@ import axios from 'axios';
 import { ScrollView } from 'react-native-gesture-handler';
 
 const ListScreen = ({ navigation, route }) => {
-    const [server_url, setServer_url] = useState('');
+    const server_url = process.env.EXPO_PUBLIC_API_URL;
     const [dataList, setDataList] = useState([]);
     const [user_id, setUser_id] = useState('');
     const [check_delete, setCheck_delete] = useState(false);
-    const [forceUpdate, setForceUpdate] = useState(false); // Add forceUpdate state
+    const [forceUpdate, setForceUpdate] = useState(false); 
 
 
     useEffect(() => {
         const user_id = route.params.user_id;
-        const server_url = route.params.server_url;
-        setServer_url(server_url);
         setUser_id(user_id);
 
         axios
@@ -53,8 +51,7 @@ const ListScreen = ({ navigation, route }) => {
                 .post(server_url + 'delete_data', { user_id: did, name: dname, nickname: dnickname })
                 .then((response) => {
                     console.log(response.data);
-                    setForceUpdate(prevState => !prevState); // Toggle forceUpdate to trigger re-render
-
+                    setForceUpdate(prevState => !prevState);
                 })
                 .catch((error) => {
                     console.error(error);

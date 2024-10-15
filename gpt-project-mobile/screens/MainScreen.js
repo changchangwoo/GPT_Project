@@ -6,7 +6,7 @@ import axios from 'axios';
 
 const MainScreen = ({ navigation, route }) => {
     const [selectedImage, setSelectedImage] = useState(null);
-    const server_url = route.params.server_url
+    const server_url = process.env.EXPO_PUBLIC_API_URL;
     const user_id = route.params.user_id
 
     const selectImageFromGallery = async () => {
@@ -39,7 +39,7 @@ const MainScreen = ({ navigation, route }) => {
             allowsEditing: true,
             aspect: [4, 3],
             quality: 1,
-            cameraType: ImagePicker.CameraType.back, // 후면 카메라 설정
+            cameraType: ImagePicker.CameraType.back,
         });
 
         if (result.canceled === false) {
@@ -48,11 +48,11 @@ const MainScreen = ({ navigation, route }) => {
     };
 
     const uploadImage = async () => {
-        const apiUrl = server_url + 'upload'; // Flask 서버의 엔드포인트 URL로 대체
+        const apiUrl = server_url + 'upload'; 
 
         const formData = new FormData();
         formData.append('image', {
-            uri: selectedImage, // 이미지 파일의 URI를 사용
+            uri: selectedImage,
             name: 'image.jpg',
             type: 'image/jpg',
         });
@@ -83,8 +83,8 @@ const MainScreen = ({ navigation, route }) => {
             },
             headerStyle: {
                 backgroundColor: 'white',
-                borderBottomWidth: 1, // 네비게이션 바 하단에 선을 추가
-                borderBottomColor: '#d3d3d3', // 선의 색상
+                borderBottomWidth: 1, 
+                borderBottomColor: '#d3d3d3',
             },
             headerTitleAlign: 'center',
         });

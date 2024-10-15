@@ -5,7 +5,7 @@ import { TextInput } from 'react-native';
 import axios from 'axios';
 
 const LoginScreen = ({ navigation, route }) => {
-    const server_url = route.params.server_url
+    const server_url = process.env.EXPO_PUBLIC_API_URL;
 
     const [id, onChangeid] = useState('');
     const [pw, onChangepw] = useState('');
@@ -36,7 +36,7 @@ const LoginScreen = ({ navigation, route }) => {
     };
 
     const handleAction = () => {
-        if (selectedButton === 'login') { // 로그인 활성화
+        if (selectedButton === 'login') {
             axios.post(server_url + 'login', { id: id, pw: pw })
                 .then(response => {
                     console.log(response.data);
@@ -50,7 +50,7 @@ const LoginScreen = ({ navigation, route }) => {
                     console.error(error);
                 });
         }
-        else if (selectedButton === 'register') { // 회원가입 활성화
+        else if (selectedButton === 'register') {
             axios.post(server_url + 'register', { id: id, pw: pw })
                 .then(response => {
                     console.log(response.data);
